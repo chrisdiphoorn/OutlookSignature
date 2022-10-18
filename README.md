@@ -6,7 +6,7 @@ Automatically Create Outlook Signatures based on Active Directory User Group Mem
 
 
    DEFAULT VALUES
-===================================================================================================================================================================
+=======================================================================================
 	Bracket Values are automatically changed like {div} {/div} = replaced with <div> </div> but only if the line does not start and end like '...'
 	'.......'> Values = Remove the '' from either end. Searches for '> or ' > to determine the end of the Line
 
@@ -14,7 +14,7 @@ Automatically Create Outlook Signatures based on Active Directory User Group Mem
 	FooterText	^ are replaced with <p>....</p> as long as the initial value does not orginally contain any <p> HTML statements
 
     ACTIVE DIRECTORY
-===================================================================================================================================================================
+=======================================================================================
 
 	       name = displayName
 	      title = title
@@ -40,7 +40,7 @@ Automatically Create Outlook Signatures based on Active Directory User Group Mem
 	
 
     NOTES FIELD Settings and Examples
-===================================================================================================================================================================
+=======================================================================================
 
 	+signature(xxxx) [ OPTIONS ] 		= will only change OPTIONS if the signature xxxx is the same name as the current processing signature
 	+signature(xxxx) +title(xxxxx)  	= will only change the title to xxxx if the signature xxxx is the same name as the current processing signature
