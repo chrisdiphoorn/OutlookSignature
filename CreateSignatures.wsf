@@ -1,0 +1,9 @@
+<job id="CreateSignatures">
+    <script language="VBScript" src="SignatureDefaults.vbs"/>
+    <script language="VBScript" src="SignatureFunctions.vbs"/>
+    <script language="VBScript" src="CreateSignatures.vbs"/> 
+    <script language="VBScript">
+    ' Here we call the main program
+    MainProgram()
+  </script>
+</job>
