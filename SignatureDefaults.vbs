@@ -7,9 +7,9 @@
 '
 Option Explicit
 
-CONST ADDomain = "DC=ad,DC=homecorp,DC=com"
+CONST ADDomain = "DC=XX,DC=XX,DC=XX"
 CONST ADS_SCOPE_SUBTREE = 2
-DIM sourceFilesUrl : sourceFilesUrl = "https://signatures.homecorp.com/"
-CONST sourceFilesIP = "http://192.168.100.74/"
-CONST LDAPurl="LDAP://OU=Signatures,OU=Groups,OU=AD - Homecorp Constructions,DC=ad,DC=homecorp,DC=com"
+DIM sourceFilesUrl : sourceFilesUrl = "https://signatures.XX.XX/"
+CONST sourceFilesIP = "http://XXX.XXX.XXX.XXX/"
+CONST LDAPurl="LDAP://OU=Signatures,OU=Groups,OU=XXXXXXX,DC=XX,DC=XX,DC=XX
                       
