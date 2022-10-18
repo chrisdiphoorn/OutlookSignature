@@ -1,34 +1,34 @@
 <!-- 
  HTML Outlook Signature File   						
- Created by C.Diphoorn July 2020
- Homecorp-Xmas.tpl 03/08/2022
+ Created by C.Diphoorn July 2022
+ SIGNATURE-Xmas.tpl 03/08/2022
 
  <*|ForceDefaultSignature|*False>
  <*|TestXmas|*01/12/2022>
  <*|Debug|*True>
  <*|InternationalPrefix|*+61>	 
- <*|Company|*Homecorp>					
- <*|CompanyPhone|*07 5518 8881>							
+ <*|Company|*SIGNATURE>					
+ <*|CompanyPhone|*07 XXXX XXXX>							
  <*|CompanyFax|*>							
- <*|CompanyURL|*homecorp.com> 	
- <*|DefaultCompany|*Homecorp>
- <*|DefaultPOBox|*PO Box 572, Surfers Paradise>
- <*|DefaultPhone|*07 5518 8881>			
- <*|DefaultAddress|*Royal Pines Marina via The Concourse,^Ross Street^Benowa QLD 4217>	
+ <*|CompanyURL|*SIGNATURE.com.au> 	
+ <*|DefaultCompany|*SIGNATURE>
+ <*|DefaultPOBox|*PO Box XXX, Gold Coast>
+ <*|DefaultPhone|*07 XXXX XXXX>			
+ <*|DefaultAddress|*Marina via The Concourse,^A Street^GoldCoast QLD 4219>	
  <*|DefaultFax|*>			
- <*|DefaultEmailDomain|*hcorp.com.au>	
- <*|DefaultWWW|*homecorp.com> 
- <*|ImageName|*Homecorp.png>
+ <*|DefaultEmailDomain|*SIGNATURE.com.au>	
+ <*|DefaultWWW|*SIGNATURE.com> 
+ <*|ImageName|*SIGNATURE.png>
 
  <*|XmasLastDay|*21/12/YYYY> 
  <*|XmasFrom|*DD/12/YYYY>
  <*|XmasTo|*DD/MM/YYYY>
  <*|XmasText|*Our office will be closed from 4.00pm on *|lastday|* We will be reopen at 8:30am on *|firstday|* with only sales display staff operating from *|firstmonday|*.>
  <*|XmasHighlightColor|*#C67D5B>
- <*|XmasImageName|*Homecorp-Xmas.png>
- <*|ReplaceEmail|*@hcorp.com.au, @priviumhomes.com.au,@impacthomes.com.au,@impactgroupaus.com.au,@privium.com.au>
- <*|MemberNote|*LDAP://CN=SG-OutlookSignatureNOTE1,OU=OutlookSignatureNotes,OU=Signatures,OU=Groups,OU=PVG,DC=ad,DC=priviumgroup,DC=com,DC=au>  	
- <*|FooterText|*Homecorp Constructions will be closed from COB *|lastday|*, reopening on *|firstday|*. We would like to take this opportunity to thank you for your continuing support during *|xmasstartyear|* and we look forward to working with you again in *|xmasfinishyear|*>
+ <*|XmasImageName|*SIGNATURE-Xmas.png>
+ <*|ReplaceEmail|*@SIGNATURE.com.au, @olddomains.com.au>
+ <*|MemberNote|*LDAP://CN=SG-OutlookSignatureNOTE1,OU=OutlookSignatureNotes,OU=Signatures,OU=Groups,OU=XXX,DC=XX,DC=XX,DC=XX,DC=XX>  	
+ <*|FooterText|*We will be closed from COB *|lastday|*, reopening on *|firstday|*. We would like to take this opportunity to thank you for your continuing support during *|xmasstartyear|* and we look forward to working with you again in *|xmasfinishyear|*>
  
  <*|DefaultImageType|*png> 
  <*|AddPhoneSpace|*True>
@@ -73,8 +73,8 @@
  <*|CombineField|*#email>
  <*|CombineHTMLCode|*'<span class="bar">|</span>&nbsp;&nbsp;<span class="highlight">E:&nbsp;</span><a href="mailto:*|email|*" style="color:#212121;text-decoration:none;text-underline:none"><span class="phone">*|email|*</span></a>&nbsp;&nbsp;'> 
  
- <*|ExtraFile|*Homecorp-Xmas-Right.png>
- <*|ExtraFile|*Homecorp-Xmas.jpg>
+ <*|ExtraFile|*SIGNATURE-Xmas-Right.png>
+ <*|ExtraFile|*SIGNATURE-Xmas.jpg>
  
  -->
 <html xmlns:v="urn:schemas-microsoft-com:vml"
@@ -97,7 +97,7 @@ xmlns="http://www.w3.org/TR/REC-html40">
   </o:OfficeDocumentSettings>
 </xml><![endif]-->
 
-<title>Homecorp Xmas Signature</title>
+<title>SIGNATURE Xmas Signature</title>
 
 <style>
 @font-face
@@ -276,7 +276,7 @@ p.normal
 					</p>
 				</td>
 				<td colspan="1" rowspan="5" width="206" style='width:154.5pt;padding:0cm 0cm 0cm 0cm; text-align:left;vertical-align: bottom;'>
-					<a href=""><span class="www"><img width="173" border="0" src="homecorp-Xmas-Right.png" alt="Merry Christmas" style="vertical-align: bottom;"/></span></a>
+					<a href=""><span class="www"><img width="173" border="0" src="SIGNATURE-Xmas-Right.png" alt="Merry Christmas" style="vertical-align: bottom;"/></span></a>
 				</td>
 			</tr>
 			<tr>				
@@ -300,7 +300,7 @@ p.normal
 			<tr>
 				<td rowspan="1" colspan="1" height="58" width="488" style='width:366pt;padding:0cm 0cm 0cm 0cm;height:43.5pt'>
 					<p class="normal" style='line-height:106%'>
-						<a href="https://*|CompanyURL|*"><span class="www"><img width="508" height="58" border="0" src="Homecorp-Xmas.jpg" alt="*|Company|*" style='vertical-align: bottom;'></span></a>
+						<a href="https://*|CompanyURL|*"><span class="www"><img width="508" height="58" border="0" src="SIGNATURE-Xmas.jpg" alt="*|Company|*" style='vertical-align: bottom;'></span></a>
 					</p>
 				</td>
 
