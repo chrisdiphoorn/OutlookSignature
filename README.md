@@ -9,7 +9,7 @@ DEFAULT VALUES
 	Bracket Values are automatically changed like {div} {/div} = replaced with <div> </div> but only if the line does not start and end like '...'
 	'.......'> Values = Remove the '' from either end. Searches for '> or ' > to determine the end of the Line.
 	Address		(Vbcr) chr(13) are removed 
-	FooterText	^ are replaced with <p>....</p> as long as the initial value does not orginally contain any <p> HTML statements
+	FooterText	^ are replaced with <p>....</p> as long as the initial value does not orginally contain any <p> HTML statements.
 
 ACTIVE DIRECTORY
 
