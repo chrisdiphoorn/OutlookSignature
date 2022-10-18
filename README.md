@@ -1,7 +1,7 @@
 # OutlookSignature
 Automatically Create Outlook Signatures based on Active Directory User Group Membership
 
-Place the CreateSignatures.vbs, CreateSignatures.wsf, SignatureDefaults.vbs, SignatureFunctions.vbs file into a Shared Folder EG: \\ServerName\FileShare
+Place the CreateSignatures.vbs, CreateSignatures.wsf, SignatureDefaults.vbs, SignatureFunctions.vbs file into a Shared Folder EG: \\\ServerName\FileShare
 Place the SIGNATURE.tpl, SIGNATURE-Xmas.tpl and any Images file into a WEB Server which only needs to be accessable from the internal Network.
 Update the SignatureDefaults.vbs file with the Relevant ADDomain, SourceFilesURL, LDAPurl details.
 	ADDomain is the root Ldap 
