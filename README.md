@@ -1,8 +1,27 @@
 # OutlookSignature
 Automatically Create Outlook Signatures based on Active Directory User Group Membership
 
+Place the CreateSignatures.vbs, CreateSignatures.wsf, SignatureDefaults.vbs, SignatureFunctions.vbs file into a Shared Folder EG: \\ServerName\FileShare
+Place the SIGNATURE.tpl, SIGNATURE-Xmas.tpl and any Images file into a WEB Server which only needs to be accessable from the internal Network.
+Update the SignatureDefaults.vbs file with the Relevant ADDomain, SourceFilesURL, LDAPurl details.
+	ADDomain is the root Ldap 
+
+Update the SIGNATURE.tpl file. Rename the File to reflect the Company Name. + Also update the contents of the file with the relevenat details and settings.
+NB: The Heading Text of the File needs to include the Name of the file. If the script does not find the name of the tpl file insdie it, it wont run.
+
+NB: The HTML code is Outlook HTML 1.0 so it does not support the newer HTML commands.
+
+From the Users Loginscript run the c:\windows\system32\cscript.exe //NoLogo \\ServerName\FileShare\CreateSignatures.wsf File.
+
+Use the users Active Directory Details to manage what is displayed in the Signature, Use the info Field to Ajdust informtaion based on multiple signatures.
+HTML, TEXT, VCF Outlook Signature Files will be created in the users \%appdata%\Roaming\Microsoft\Signatures\ Folder.
+
+Any Images associated with the Signature will also be copied in to the signatures folder. If the DefaultImageType is set to png then the SignatureName.png is automatically copied. Use the AdditionalImage settings to copy other image files.
+
+Enable the Debug True in the tpl file to also create a debug.txt file that creates information on what settings were set and modified in each signature.
 
 **DEFAULT VALUES**
+
 	Bracket Values are automatically changed like {div} {/div} = replaced with <div> </div> but only if the line does not start and end like '...'
 	'.......'> Values = Remove the '' from either end. Searches for '> or ' > to determine the end of the Line.
 	Address		(Vbcr) chr(13) are removed 
@@ -32,7 +51,7 @@ Automatically Create Outlook Signatures based on Active Directory User Group Mem
 	WhenChanged = WhenChanged
 	      notes = info
 	
-NOTES FIELD Settings and Examples
+NOTES Field Settings and Examples.
 
 	+signature(xxxx) [ OPTIONS ] 		= will only change OPTIONS if the signature xxxx is the same name as the current processing signature
 	+signature(xxxx) +title(xxxxx)  	= will only change the title to xxxx if the signature xxxx is the same name as the current processing signature
