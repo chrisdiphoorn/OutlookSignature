@@ -1,32 +1,32 @@
 <!-- 
  HTML Outlook Signature File   						
- Created by C.Diphoorn July 2020
- Homecorp.tpl 23/07/2020
+ Created by C.Diphoorn July 2022
+ SIGNATURE.tpl 23/07/2022
 
  <*|ForceDefaultSignature|*True>
 
  <*|Debug|*True>
  <*|InternationalPrefix|*+61>	 
- <*|Company|*Homecorp>					
+ <*|Company|*SIGNATURE>					
  <*|CompanyPhone|*07 5518 8881>							
  <*|CompanyFax|*>							
- <*|CompanyURL|*homecorp.com> 	
- <*|DefaultCompany|*Homecorp>
- <*|DefaultPOBox|*PO Box 572, Surfers Paradise>
- <*|DefaultPhone|*07 5518 8881>			
- <*|DefaultAddress|*Royal Pines Marina via The Concourse,^Ross Street^Benowa QLD 4217>	
+ <*|CompanyURL|*SIGNATURE.com> 	
+ <*|DefaultCompany|*SIGNATURE>
+ <*|DefaultPOBox|*PO Box xxx, Gold Coast>
+ <*|DefaultPhone|*07 XXXX XXXX>			
+ <*|DefaultAddress|*Marina via The Concourse,^A Street^Gold Coast QLD 4217>	
  <*|DefaultFax|*>			
- <*|DefaultEmailDomain|*hcorp.com.au>	
- <*|DefaultWWW|*homecorp.com> 
- <*|ImageName|*Homecorp.png>
+ <*|DefaultEmailDomain|*SIGNATURE.COM.AU>	
+ <*|DefaultWWW|*SIGNATURE.com> 
+ <*|ImageName|*SIGNATURE.png>
 
  <*|XmasFrom|*21/12/YYYY>
  <*|XmasTo|*09/01/YYYY>
- <*|XmasText|*Our office will be closed from 4.00pm on *|lastday|* We will be reopen at 8:30am on *|firstday|* with only sales display staff operating from *|firstmonday|*.>
+ <*|XmasText|*Our office will be closed from 4.00pm on *|lastday|* We will be reopen at 8:30am on *|firstday|* with only sales staff operating from *|firstmonday|*.>
  <*|XmasHighlightColor|*#C67D5B>
- <*|XmasImageName|*Homecorp-Xmas.png>
- <*|ReplaceEmail|*@hcorp.com.au, @privium.com.au>
- <*|FooterText|*Homecorp Constructions will be closed from COB *|lastday|*, reopening on *|firstday|*. We would like to take this opportunity to thank you for your continuing support during *|xmasstartyear|* and we look forward to working with you again in *|xmasfinishyear|*>
+ <*|XmasImageName|*SIGNATURE-Xmas.png>
+ <*|ReplaceEmail|*@SIGNATURE.com.au, @OLDdomain.com.au>
+ <*|FooterText|*SIGNATURE will be closed from COB *|lastday|*, reopening on *|firstday|*. We would like to take this opportunity to thank you for your continuing support during *|xmasstartyear|* and we look forward to working with you again in *|xmasfinishyear|*>
  
  <*|DefaultImageType|*png> 
  <*|AddPhoneSpace|*True>
@@ -71,8 +71,8 @@
  <*|CombineField|*#email>
  <*|CombineHTMLCode|*'<span class="bar">|</span>&nbsp;&nbsp;<span class="highlight">E:&nbsp;</span><a href="mailto:*|email|*" style="color:#212121;text-decoration:none;text-underline:none"><span class="phone">*|email|*</span></a>&nbsp;&nbsp;'> 
  
- <*|ExtraFile|*homecorp-mb2021.png>
- <*|ExtraFile|*Homecorp-Xmas-Right.png>
+ <*|ExtraFile|*SIGNATURE2.png>
+ <*|ExtraFile|*SIGNATURE-Xmas-Right.png>
  
  -->
 <html xmlns:v="urn:schemas-microsoft-com:vml"
@@ -95,7 +95,7 @@ xmlns="http://www.w3.org/TR/REC-html40">
   </o:OfficeDocumentSettings>
 </xml><![endif]-->
 
-<title>Homecorp Signature</title>
+<title>SIGNATURE Signature</title>
 
 <style>
 @font-face
@@ -274,7 +274,7 @@ p.normal
 					</p>
 				</td>
 				<td colspan="1" rowspan="3" width="206" style='width:154.5pt;padding:0cm 0cm 0cm 0cm; text-align:right;vertical-align: bottom;'>
-					<a href=""><span class="www"><img width="173" height="70" border="0" src="homecorp-mb2021.png" alt="Homecorp Master Builder" 'style='vertical-align: bottom;'></span></a>
+					<a href=""><span class="www"><img width="173" height="70" border="0" src="SIGNATURE2.png" alt="PICTURE ALT TEXT 2" 'style='vertical-align: bottom;'></span></a>
 				</td>
 			</tr>
 			<tr>				
