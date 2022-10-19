@@ -1,7 +1,6 @@
 # OutlookSignature
 Automatically Create Outlook Signatures on Windows Workstations based on Active Directory User Group Membership
 
-TODO:
 Place the CreateSignatures.vbs, CreateSignatures.wsf, SignatureDefaults.vbs, SignatureFunctions.vbs files into a Shared Folder EG: \\\ServerName\FileShare
 Place the SIGNATURE.tpl, SIGNATURE-Xmas.tpl and any Images file into a WEB Server which only needs to be accessable from the internal Network.
 Update the SignatureDefaults.vbs file with the Relevant ADDomain, SourceFilesURL, LDAPurl details.
@@ -13,7 +12,6 @@ NOTE: The Heading Text of the File needs to include the Name of the file. If the
 NB: The HTML code is Outlook HTML 1.0 so it does not support the newer HTML commands.
 Each .tpl file is split up into 2 main sections. The Signature Variables & Settings ( Set Between the {<!-- -->}) , and the Signature HTML Code.
 
-TODO:
 Create Signature Group(s) and place users into these/this Group(s). Ensure that the Description Of the Group is the Name of the Signature .tpl file.
 Update the OU details into the SignatureDeafult file so the script knows where to look for the Signature Group(s).
 
