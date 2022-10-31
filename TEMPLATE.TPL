@@ -1,9 +1,75 @@
 <!-- 
  HTML Outlook Signature File   						
  Created by C.Diphoorn Dec 2019 / May 2020
- Template.TPL 10/12/2019	NB ** Ensure you modifiy this name to the same name as the file you have created.
+ TEMPLATE.TPL 10/12/2019	NB ** Ensure you modifiy this name to the same name as the file you have created.
  
-
+ <*|ForceDefaultSignature|*True>
+ <*|Debug|*True>
+ <*|InternationalPrefix|*+61>	 
+ <*|Company|*COMPANY NAME>
+ <*|CompanyPhone|*07 5555 5555>	
+ <*|CompanyFax|*>
+ <*|CompanyURL|*www.URL.com.au>
+ <*|DefaultCompany|*COMPANY NAME>
+ <*|DefaultPOBox|*PO Box xxx, Brisbane>
+ <*|DefaultPhone|*07 XXXX XXXX>	
+ <*|DefaultAddress|*Unit 1, 24 Street ST, Suburb>
+ <*|DefaultFax|*>
+ <*|DefaultEmailDomain|*DOMAIN.COM.AU>	
+ <*|DefaultWWW|*WWW.DOMAIN.com.au> 
+ <*|ImageName|*SIGNATURE.png>
+ <*|XmasFrom|*21/12/YYYY>
+ <*|XmasTo|*09/01/YYYY>
+ <*|XmasText|*Our office will be closed from 4.00pm on *|lastday|* We will be reopen at 8:30am on *|firstday|* with only sales staff operating from *|firstmonday|*.>
+ <*|XmasHighlightColor|*#C67D5B>
+ <*|XmasImageName|*SIGNATURE-Xmas.png>
+ <*|ReplaceEmail|*@SIGNATURE.com.au, @OLDdomain.com.au>
+ <*|FooterText|*SIGNATURE will be closed from COB *|lastday|*, reopening on *|firstday|*. We would like to take this opportunity to thank you for your continuing support during *|xmasstartyear|* and we look forward to working with you again in *|xmasfinishyear|*>
+ 
+ <*|DefaultImageType|*png> 
+ <*|AddPhoneSpace|*True>
+ <*|AddAddressSpace|*True>
+ <*|AddAdditionalAddressSpace|*True>
+ <*|AddAdditionalStateSpace|*True>
+ <*|AddAdditionalCitySpace|*False>
+ <*|ForceCreate|*False>
+ <*|ForceDefaultSignature|*False>
+ <*|HideTableRows|*True>
+ <*|AutoPOBox|*True> 
+  
+ <*|SocialIcon|*>									
+ <*|SocialIconLink|*>
+ 
+ <*|InsertHTML|*address>							
+ <*|InsertHTMLFind|*char(10)>						
+ <*|InsertHTMLCode|*'&nbsp;&nbsp;<span class="bar">|</span>&nbsp;&nbsp;'> 	
+ 
+ <*|LinkWWWColor|*#DA0E28>
+ <*|SymbolColor|*#DA0E28>
+ <*|TextColor|*#7F7F7F>
+ <*|TextColorHighlight|*#DA0E28>
+ <*|TextFooterColor|*#00000>
+ <*|BarColor|*#7F7F7F>
+ <*|HyperLinkColor|*#7F7F7F>
+ <*|DefaultFont|*"Arial", sans-serif>
+ <*|DefaultFontSize|*10.0pt>
+ 
+ <*|TransformState|*UPPER>
+ <*|TransformMobile|*MOBILE>
+ <*|TransformPhone|*PHONE>
+ <*|TransformCompanyPhone|*PHONE>
+ <*|TransformEmail|*LOWER>
+  
+ <*|Combine|*companyphone+mobile+email>
+ <*|CombineLastCode|*True>
+ <*|CombineField|*#companyphone>
+ <*|CombineHTMLCode|*'<span class="highlight">T:&nbsp;</span><a href="tel:*|companyphone|*" style="color:#212121;text-decoration:none;text-underline:none"><span class="phone">*|companyphone|*</span></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'>
+ <*|CombineField|*#mobile>
+ <*|CombineHTMLCode|*'<span class="bar">|</span>&nbsp;&nbsp;<span class="highlight">M:&nbsp;</span><a href="tel:*|mobile|*" style="color:#212121;text-decoration:none;text-underline:none"><span class="phone">*|mobile|*</span></a>&nbsp;&nbsp;'>
+ <*|CombineField|*#email>
+ <*|CombineHTMLCode|*'<span class="bar">|</span>&nbsp;&nbsp;<span class="highlight">E:&nbsp;</span><a href="mailto:*|email|*" style="color:#212121;text-decoration:none;text-underline:none"><span class="phone">*|email|*</span></a>&nbsp;&nbsp;'> 
+ 
+ 
 -->
 
 <html xmlns:v="urn:schemas-microsoft-com:vml"
