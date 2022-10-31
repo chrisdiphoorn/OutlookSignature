@@ -47,7 +47,7 @@ Dim name: name = " "
 Dim name_v 
 Dim firstname :firstname =" "
 Dim firstname_v
-Dim lastname : lastname =" "
+Dim lastname : lastname = " "
 Dim lastname_v
 Dim title: title = " "
 Dim title_v 
@@ -55,7 +55,7 @@ Dim phone: phone = " "
 Dim phone_v 
 Dim mobile: mobile = " "
 Dim mobile_v 
-Dim ipphone: ipphone =" "
+Dim ipphone: ipphone = " "
 Dim ipphone_v
 Dim email: email = " "
 Dim email_v 
@@ -69,16 +69,16 @@ Dim country: country = " "
 Dim country_v 
 Dim postcode: postcode = " "
 Dim postcode_v
-Dim pobox: pobox =" "
+Dim pobox: pobox = " "
 Dim pobox_v 
 Dim suburb: suburb = " "
 Dim suburb_v 
-dim office: office =" "
+dim office: office = " "
 dim office_v 
-dim webpage: webpage =" "
+dim webpage: webpage = " "
 dim href
 dim webpage_v 
-dim countryname: countryname =" "
+dim countryname: countryname = " "
 dim countryname_v
 dim department: department= " "
 dim department_v 
@@ -96,7 +96,7 @@ Dim SignatureWidth, SignatureHeight
 DIM IDnumber, IDnumber_v, userName
 DIM vcardPhoto, FullStateName
 DIM membernote
-DIM Spc: Spc="&nbsp;"
+DIM Spc: Spc = "&nbsp;"
 DIM CountryNames, StateNames
 DIM CountryCodes, StateCodes
 DIM InternationalPrefix 
@@ -126,7 +126,7 @@ DIM uuseraddress, uuserstate, uusersuburb, uuserpobox, uusermobile, uuserpostcod
 DIM cyear,cmonth, cday, cdayname, cmonthname, cmmonth, cdday
 
 DIM DataChanged: DataChanged = False
-DIM DataChangedDate: DataChangedDate =""
+DIM DataChangedDate: DataChangedDate = ""
 
 DIM SocialIcon(10), SocialIconLink(10), SocialIconAlt(10), SocialIconName, Socialtmpname, ForceSocialIcon
 DIM MaxSocialIcons: MaxSocialIcons = 0
@@ -214,32 +214,32 @@ Sub CreateSignature(SignatureName, templateFileName)
 
 
 	' Dont run this proceedure if the name value is blank.
-	IF SignatureName ="" or templateFileName = ".tpl" then exit sub
+	IF SignatureName = "" or templateFileName = ".tpl" then exit sub
     
 	' Cleanup values so they cant be re-used in other signatures by accident.
-	HighlightColor="": aditionalimage="": xmastext_v="": xmastext="": imagename="":EmailDomain=""
-	DefaultCompany="":DefaultFax="":DefaultPhone="":DefaultDomain="":DefaultEmailDomain="":DefaultPOBox="":DefaultCountry="":DefaultEmail="":DefaultSuburb="":DefaultWWW="":DefaultHREF=""
-	DefaultTitle="": DefaultName = "": DefaultState ="":DefaultAddress="": DefaultMobile="": DefaultPostCode =""
-	ccompany="":ccompanyfax="":ccompanyphone="":Company="":CompanyFax="":CompanyPhone=""
-	uuseraddress="": uuserstate ="":uusersuburb="":uuserpobox ="":uusermobile="":uuserpostcode=""
+	HighlightColor = "": aditionalimage = "": xmastext_v = "": xmastext = "": imagename = "":EmailDomain = ""
+	DefaultCompany = "":DefaultFax = "":DefaultPhone = "":DefaultDomain = "":DefaultEmailDomain = "":DefaultPOBox = "":DefaultCountry = "":DefaultEmail = "":DefaultSuburb= "":DefaultWWW= "":DefaultHREF= ""
+	DefaultTitle = "": DefaultName = "": DefaultState = "":DefaultAddress = "": DefaultMobile = "": DefaultPostCode = ""
+	ccompany = "":ccompanyfax = "":ccompanyphone = "":Company = "":CompanyFax = "":CompanyPhone = ""
+	uuseraddress = "": uuserstate = "":uusersuburb = "":uuserpobox = "":uusermobile = "":uuserpostcode = ""
 	SignatureWidth = "": SignatureHeight = ""
-	companyurl="": readreplaceemail ="":SocialIconName="":ForceSocialIcon=""
-    vcardPhoto ="": FullStateName="": extranote ="":extranote_v ="": membernote =""
-	TransformTitle="":TransformState="":TransformMobile="": TransformName="": TransformPhone="": TransformCity="":TransformCountry=""
+	companyurl = "": readreplaceemail = "":SocialIconName= "":ForceSocialIcon = ""
+    vcardPhoto = "": FullStateName = "": extranote = "":extranote_v = "": membernote = ""
+	TransformTitle= "":TransformState= "":TransformMobile= "": TransformName= "": TransformPhone= "": TransformCity= "":TransformCountry= ""
 	ForceSignature = False: ForceCreate=False: MaxSocialIcons =0
 	AddPhoneSpace = False: AddAddressSpace = False
 	AddAdditionalCitySpace = False: AddAdditionalSuburbSpace= False: AddAdditionalPOBoxSpace = False: AddAdditionalStateSpace = False
 	AddAdditionalAddressSpace = False: AddAdditionalTitleSpace = False: AddAdditionalPrevTitleSpace = False
 	AutoPOBox = False
-	MaxVariables = 0: MaxInsertHTML = 0: footertext =""
-	MaxEncodeImage=0: InternationalPrefix ="": DisplaySocialIcons = True
+	MaxVariables = 0: MaxInsertHTML = 0: footertext = ""
+	MaxEncodeImage=0: InternationalPrefix = "": DisplaySocialIcons = True
 	RemoveCompanyPhone = False:	AdminDefaultSignature = False
-	OverrideTitle ="": OverrideSignatureTitle="": OverrideAddress = "": OverrideState ="": OverridePostCode="":OverrideCompanyPhone="":OverrideEmail=""
-	HideTableRows = False: IncludeFile="": IncludeFileHTML=""
-	LinkWWWColor="":SymbolColor="":TextColor="":TextColorHighlight="":TextFooterColor="":BarColor="":HyperLinkColor="":DefaultFont="Lucida,sans-serif":DefaultFontSize="11.0pt":LargerFontSize="11.0pt": DefaultLineHeight="11.0pt"
-	TestXmas = False: XmasOverWriteColor ="":xmashighlight ="": xmasoverwrite ="": xmassignature =""
-	findTitle="": findAddress ="": findAddress ="": findSignature =""
-	IsXmas = false: AutoXmas = False: TestXmasDate ="": XmasDay = "": XmasAdjust = 1
+	OverrideTitle = "": OverrideSignatureTitle= "": OverrideAddress = "": OverrideState = "": OverridePostCode= "":OverrideCompanyPhone= "":OverrideEmail= ""
+	HideTableRows = False: IncludeFile= "": IncludeFileHTML= ""
+	LinkWWWColor= "":SymbolColor= "":TextColor= "":TextColorHighlight= "":TextFooterColor= "":BarColor= "":HyperLinkColor= "":DefaultFont="Lucida,sans-serif":DefaultFontSize="11.0pt":LargerFontSize="11.0pt": DefaultLineHeight="11.0pt"
+	TestXmas = False: XmasOverWriteColor = "":xmashighlight = "": xmasoverwrite = "": xmassignature = ""
+	findTitle= "": findAddress = "": findAddress = "": findSignature = ""
+	IsXmas = false: AutoXmas = False: TestXmasDate = "": XmasDay = "": XmasAdjust = 1
 
     DIM xmasfrom, xmasto, part1, p1, NewMonday, XmasLastDay, preMonday, NewYearStartWeek, WeeksClosed
     DIM SignatureImageFolder, templateFilePath, headerHTML, templateHTML,  templateTEXT
@@ -290,7 +290,7 @@ Sub CreateSignature(SignatureName, templateFileName)
 	cmmonth = trim(cstr(cmonth))
 	if len(cmmonth) =1 then cmmonth ="0"+cmmonth
 	
-    cdayname = WeekdayName(Weekday(date, 1),False,1)
+    cdayname = WeekdayName(Weekday(date, 1),False, 1)
     cmonthname = MonthName(cmonth)
 
 	
@@ -301,9 +301,9 @@ Sub CreateSignature(SignatureName, templateFileName)
 ' If there is a Template file (.tpl) then use it 	
 IF LEN(templateFilePath) > 0 THEN
     
-	templateTEXT=""
-	templateHTML=""
-	headerHTML=""
+	templateTEXT= ""
+	templateHTML= ""
+	headerHTML= ""
 	
 	templateHTML = GetOutlookSignatureHtml(templateFilePath)
     headerHTML = ReadHeaderSignatureHtml(templateHTML, SignatureName)
@@ -492,7 +492,7 @@ IF LEN(templateFilePath) > 0 THEN
 			if Weekday(cdate(XmasDay)) =  7 then XmasAdjust = 3 ' Saturday so LastDay Wednesday
 			
 			XmasLastDay = Replace(XmasLastDay, "DD", cstr(25-XmasAdjust))
-			' an alternative XmasLastDay = FindLastDay(XmasLastDay,1)
+			' an alternative XmasLastDay = FindLastDay(XmasLastDay, 1)
 			
 		END IF
 		
@@ -597,7 +597,7 @@ IF LEN(templateFilePath) > 0 THEN
 					newMonday = FindWeekinDate(xmasto, 2)
 				END SELECT
 
-				'if len(XmasLastDay) = 0 then XmasLastDay = FindLastDay(xmasfrom,1)  ' Extra day added 
+				'if len(XmasLastDay) = 0 then XmasLastDay = FindLastDay(xmasfrom, 1)  ' Extra day added 
 				
 				preMonday = FindWeekinDate(xmasto, 1)
 
@@ -663,7 +663,7 @@ IF LEN(templateFilePath) > 0 THEN
 				
 				' Replace the highlight color in the HTML code with the Xmas Highlight Color
 				if len(xmashighlight) then 
-					templateHTML = Replace(templateHTML,"*|XmasHighlightColor|*",xmashighlight,1,-1,1)
+					templateHTML = Replace(templateHTML,"*|XmasHighlightColor|*",xmashighlight, 1, -1, 1)
 				end if
 				
 				' Setting the Xmas Image Name if it was previously blank.
@@ -1077,7 +1077,7 @@ IF LEN(templateFilePath) > 0 THEN
 			select case LCASE(InsertHTML(MaxInsertHTML))
 					case "address"
 						address = tmpInsertHTML
-						address = replace(address,chr(13),"",1,-1,1)
+						address = replace(address,chr(13),"", 1, -1, 1)
 					case "notes"
 						notes = tmpInsertHTML
 			end select
@@ -1155,8 +1155,8 @@ IF LEN(templateFilePath) > 0 THEN
 				if Chtml = "''" then CHtml = ""
 				
 				if len(CHtml) > 2 then 
-					if left(CHtml,1) = "'" then CHtml = mid(CHtml, 2,len(CHtml))
-					if right(CHtml,1) = "'" then CHtml = left(CHtml,len(CHtml)-1)
+					if left(CHtml, 1) = "'" then CHtml = mid(CHtml, 2,len(CHtml))
+					if right(CHtml, 1) = "'" then CHtml = left(CHtml,len(CHtml)-1)
 				end if
 				
 				FindField = CField
@@ -1182,21 +1182,21 @@ IF LEN(templateFilePath) > 0 THEN
 						if chi = MaxCombineHTML(ci) and FCombineLast = False then FindCode = ""
 						
 						if FindCode <> "" then 
-							FindCode  = Replace(FindCode ,"href=" + chr(34) + "tel:*|"&CField&"|*","href=" + chr(34) + "tel:"+replace(StripHTML(Eval(CField))," ",""),1,-1,1)
-							FindCode  = Replace(FindCode ,"href =" + chr(34) + "tel:*|"&CField&"|*","href=" + chr(34) + "tel:"+replace(StripHTML(Eval(CField))," ",""),1,-1,1)
-							FindCode  = Replace(FindCode ,"href= " + chr(34) + "tel:*|"&CField&"|*","href=" + chr(34) + "tel:"+replace(StripHTML(Eval(CField))," ",""),1,-1,1)
-							FindCode  = Replace(FindCode ,"href = " + chr(34) + "tel:*|"&CField&"|*","href=" + chr(34) + "tel:"+replace(StripHTML(Eval(CField))," ",""),1,-1,1)
+							FindCode  = Replace(FindCode ,"href=" + chr(34) + "tel:*|"&CField&"|*" ,"href=" + chr(34) + "tel:"+replace(StripHTML(Eval(CField))," " ,""), 1, -1, 1)
+							FindCode  = Replace(FindCode ,"href =" + chr(34) + "tel:*|"&CField&"|*" ,"href=" + chr(34) + "tel:"+replace(StripHTML(Eval(CField))," " ,""), 1, -1, 1)
+							FindCode  = Replace(FindCode ,"href= " + chr(34) + "tel:*|"&CField&"|*" ,"href=" + chr(34) + "tel:"+replace(StripHTML(Eval(CField))," " ,""), 1, -1, 1)
+							FindCode  = Replace(FindCode ,"href = " + chr(34) + "tel:*|"&CField&"|*" ,"href=" + chr(34) + "tel:"+replace(StripHTML(Eval(CField))," " ,""), 1, -1, 1)
 							
-							FindCode  = Replace(FindCode ,"href=" + chr(34) + "mailto:|*"&CField&"|*","href=" + chr(34) + "mailto:" + replace(StripHTML(Eval(CField))," ",""),1,-1,1)
-							FindCode  = Replace(FindCode ,"href =" + chr(34) + "mailto:*|"&CField&"|*","href=" + chr(34) + "mailto:" + replace(StripHTML(Eval(CField))," ",""),1,-1,1)
-							FindCode  = Replace(FindCode ,"href= " + chr(34) + "mailto:*|"&CField&"|*","href=" + chr(34) + "mailto:" + replace(StripHTML(Eval(CField))," ",""),1,-1,1)
-							FindCode  = Replace(FindCode ,"href = " + chr(34) + "mailto:*|"&CField&"|*","href=" + chr(34) + "mailto:" + replace(StripHTML(Eval(CField))," ",""),1,-1,1)
+							FindCode  = Replace(FindCode ,"href=" + chr(34) + "mailto:|*"&CField&"|*" ,"href=" + chr(34) + "mailto:" + replace(StripHTML(Eval(CField))," " ,""), 1, -1, 1)
+							FindCode  = Replace(FindCode ,"href =" + chr(34) + "mailto:*|"&CField&"|*" ,"href=" + chr(34) + "mailto:" + replace(StripHTML(Eval(CField))," " ,""), 1, -1, 1)
+							FindCode  = Replace(FindCode ,"href= " + chr(34) + "mailto:*|"&CField&"|*" ,"href=" + chr(34) + "mailto:" + replace(StripHTML(Eval(CField))," " ,""), 1, -1, 1)
+							FindCode  = Replace(FindCode ,"href = " + chr(34) + "mailto:*|"&CField&"|*" ,"href=" + chr(34) + "mailto:" + replace(StripHTML(Eval(CField))," " ,""), 1, -1, 1)
 							
-							FindCode  = Replace(FindCode ,"*|"&CField&"|*",StripHTML(Eval(CField)),1,-1,1)
-							FindCode  = Replace(FindCode ,"*|HighlightColor|*",HighlightColor,1,-1,1) 
-							FindCode  = Replace(FindCode ,"*|TextColor|*",TextColor,1,-1,1) 
-							FindCode  = Replace(FindCode ,"*|BarColor|*",BarColor,1,-1,1) 
-							FindCode  = Replace(FindCode ,"*|TextColorHighlight|*",TextColorHighlight,1,-1,1) 
+							FindCode  = Replace(FindCode ,"*|"&CField&"|*",StripHTML(Eval(CField)), 1, -1, 1)
+							FindCode  = Replace(FindCode ,"*|HighlightColor|*",HighlightColor, 1, -1, 1) 
+							FindCode  = Replace(FindCode ,"*|TextColor|*",TextColor, 1, -1, 1) 
+							FindCode  = Replace(FindCode ,"*|BarColor|*",BarColor, 1, -1, 1) 
+							FindCode  = Replace(FindCode ,"*|TextColorHighlight|*",TextColorHighlight, 1, -1, 1) 
 						
 							if Plus = True then CombineData = CombineData + FindCode+Eval(CField)
 							if Minus = True then CombineData = CombineData + Eval(CField) + FindCode
@@ -1244,30 +1244,30 @@ IF LEN(templateFilePath) > 0 THEN
 	END IF
 	
     ' Make global template value replacements in the HTML code
-	templateHTML = Replace(templateHTML,"*|name|*", name,1,-1,1)
-	templateHTML = Replace(templateHTML,"*|name_v|*", name_v,1,-1,1)
-	templateHTML = Replace(templateHTML,"*|title|*", title,1,-1,1)
-	templateHTML = Replace(templateHTML,"*|title_v|*", title_v,1,-1,1)
-	templateHTML = Replace(templateHTML,"href=" + chr(34) + "tel:*|phone|*","href=" + chr(34) + "tel:" + replace(StripHTML(phone)," ",""),1,-1,1)
-	templateHTML = Replace(templateHTML,"href =" + chr(34) + "tel:*|phone|*","href=" + chr(34) + "tel:" + replace(StripHTML(phone)," ",""),1,-1,1)
-	templateHTML = Replace(templateHTML,"href= " + chr(34) + "tel:*|phone|*","href=" + chr(34) + "tel:" + replace(StripHTML(phone)," ",""),1,-1,1)
-	templateHTML = Replace(templateHTML,"href = " + chr(34) + "tel:*|phone|*","href=" + chr(34) + "tel:" + replace(StripHTML(phone)," ",""),1,-1,1)
-	templateHTML = Replace(templateHTML,"*|phone|*", phone,1,-1,1)
-	templateHTML = Replace(templateHTML,"*|phone_v|*", phone_v,1,-1,1)
-	templateHTML = Replace(templateHTML,"*|ipphone|*", ipphone,1,-1,1)
-	templateHTML = Replace(templateHTML,"*|ipphone_v|*", ipphone_v,1,-1,1)
-	templateHTML = Replace(templateHTML,"href=" + chr(34) + "tel:*|mobile|*","href=" + chr(34) + "tel:"+replace(StripHTML(mobile)," ",""),1,-1,1)
-	templateHTML = Replace(templateHTML,"href =" + chr(34) + "tel:*|mobile|*","href=" + chr(34) + "tel:"+replace(StripHTML(mobile)," ",""),1,-1,1)
-	templateHTML = Replace(templateHTML,"href= " + chr(34) + "tel:*|mobile|*","href=" + chr(34) + "tel:"+replace(StripHTML(mobile)," ",""),1,-1,1)
-	templateHTML = Replace(templateHTML,"href = " + chr(34) + "tel:*|mobile|*","href=" + chr(34) + "tel:"+replace(StripHTML(mobile)," ",""),1,-1,1)
-	templateHTML = Replace(templateHTML,"*|mobile|*", mobile,1,-1,1)
-	templateHTML = Replace(templateHTML,"*|mobile_v|*", mobile_v,1,-1,1)
-	templateHTML = Replace(templateHTML,"href=" + chr(34) + "mailto:*|email|*","href=" + chr(34) + "mailto:" + replace(StripHTML(email)," ",""),1,-1,1)
-	templateHTML = Replace(templateHTML,"href =" + chr(34) + "mailto:*|email|*","href=" + chr(34) + "mailto:" + replace(StripHTML(email)," ",""),1,-1,1)
-	templateHTML = Replace(templateHTML,"href= " + chr(34) + "mailto:*|email|*","href=" + chr(34) + "mailto:" + replace(StripHTML(email)," ",""),1,-1,1)
-	templateHTML = Replace(templateHTML,"href = " + chr(34) + "mailto:*|email|*","href=" + chr(34) + "mailto:" + replace(StripHTML(email)," ",""),1,-1,1)
-	templateHTML = Replace(templateHTML,"*|email|*", email,1,-1,1)
-	templateHTML = Replace(templateHTML,"*|email_v|*", email_v,1,-1,1)
+	templateHTML = Replace(templateHTML,"*|name|*", name, 1, -1, 1)
+	templateHTML = Replace(templateHTML,"*|name_v|*", name_v, 1, -1, 1)
+	templateHTML = Replace(templateHTML,"*|title|*", title, 1, -1, 1)
+	templateHTML = Replace(templateHTML,"*|title_v|*", title_v, 1, -1, 1)
+	templateHTML = Replace(templateHTML,"href=" + chr(34) + "tel:*|phone|*","href=" + chr(34) + "tel:" + replace(StripHTML(phone)," ",""), 1, -1, 1)
+	templateHTML = Replace(templateHTML,"href =" + chr(34) + "tel:*|phone|*","href=" + chr(34) + "tel:" + replace(StripHTML(phone)," ",""), 1, -1, 1)
+	templateHTML = Replace(templateHTML,"href= " + chr(34) + "tel:*|phone|*","href=" + chr(34) + "tel:" + replace(StripHTML(phone)," ",""), 1, -1, 1)
+	templateHTML = Replace(templateHTML,"href = " + chr(34) + "tel:*|phone|*","href=" + chr(34) + "tel:" + replace(StripHTML(phone)," ",""), 1, -1, 1)
+	templateHTML = Replace(templateHTML,"*|phone|*", phone, 1, -1, 1)
+	templateHTML = Replace(templateHTML,"*|phone_v|*", phone_v, 1, -1, 1)
+	templateHTML = Replace(templateHTML,"*|ipphone|*", ipphone, 1, -1, 1)
+	templateHTML = Replace(templateHTML,"*|ipphone_v|*", ipphone_v, 1, -1, 1)
+	templateHTML = Replace(templateHTML,"href=" + chr(34) + "tel:*|mobile|*","href=" + chr(34) + "tel:"+replace(StripHTML(mobile)," ",""), 1, -1, 1)
+	templateHTML = Replace(templateHTML,"href =" + chr(34) + "tel:*|mobile|*","href=" + chr(34) + "tel:"+replace(StripHTML(mobile)," ",""), 1, -1, 1)
+	templateHTML = Replace(templateHTML,"href= " + chr(34) + "tel:*|mobile|*","href=" + chr(34) + "tel:"+replace(StripHTML(mobile)," ",""), 1, -1, 1)
+	templateHTML = Replace(templateHTML,"href = " + chr(34) + "tel:*|mobile|*","href=" + chr(34) + "tel:"+replace(StripHTML(mobile)," ",""), 1, -1, 1)
+	templateHTML = Replace(templateHTML,"*|mobile|*", mobile, 1, -1, 1)
+	templateHTML = Replace(templateHTML,"*|mobile_v|*", mobile_v, 1, -1, 1)
+	templateHTML = Replace(templateHTML,"href=" + chr(34) + "mailto:*|email|*","href=" + chr(34) + "mailto:" + replace(StripHTML(email)," ",""), 1, -1, 1)
+	templateHTML = Replace(templateHTML,"href =" + chr(34) + "mailto:*|email|*","href=" + chr(34) + "mailto:" + replace(StripHTML(email)," ",""), 1, -1, 1)
+	templateHTML = Replace(templateHTML,"href= " + chr(34) + "mailto:*|email|*","href=" + chr(34) + "mailto:" + replace(StripHTML(email)," ",""), 1, -1, 1)
+	templateHTML = Replace(templateHTML,"href = " + chr(34) + "mailto:*|email|*","href=" + chr(34) + "mailto:" + replace(StripHTML(email)," ",""), 1, -1, 1)
+	templateHTML = Replace(templateHTML,"*|email|*", email, 1, -1, 1)
+	templateHTML = Replace(templateHTML,"*|email_v|*", email_v, 1, -1, 1)
 
 	templateHTML = Replace(templateHTML,"*|highlightcolor|*", HighlightColor, 1, -1, 1)      
 	templateHTML = Replace(templateHTML,"*|signaturename|*", SignatureName, 1, -1, 1)
@@ -1284,18 +1284,18 @@ IF LEN(templateFilePath) > 0 THEN
 
   	templateHTML = Replace(templateHTML,"*|company|*",company, 1, -1, 1)
 	templateHTML = Replace(templateHTML,"*|company_v|*",company_v, 1, -1, 1)
-	templateHTML = Replace(templateHTML,"href=" + chr(34) + "tel:*|companyphone|*","href=" + chr(34) + "tel:"+replace(StripHTML(companyphone)," ",""),1,-1,1)
-	templateHTML = Replace(templateHTML,"href =" + chr(34) + "tel:*|companyphone|*","href=" + chr(34) + "tel:"+replace(StripHTML(companyphone)," ",""),1,-1,1)
-	templateHTML = Replace(templateHTML,"href= " + chr(34) + "tel:*|companyphone|*","href=" + chr(34) + "tel:"+replace(StripHTML(companyphone)," ",""),1,-1,1)
-	templateHTML = Replace(templateHTML,"href = " + chr(34) + "tel:*|companyphone|*","href=" + chr(34) + "tel:" + replace(StripHTML(companyphone)," ",""),1,-1,1)
+	templateHTML = Replace(templateHTML,"href=" + chr(34) + "tel:*|companyphone|*","href=" + chr(34) + "tel:"+replace(StripHTML(companyphone)," ",""), 1, -1, 1)
+	templateHTML = Replace(templateHTML,"href =" + chr(34) + "tel:*|companyphone|*","href=" + chr(34) + "tel:"+replace(StripHTML(companyphone)," ",""), 1, -1, 1)
+	templateHTML = Replace(templateHTML,"href= " + chr(34) + "tel:*|companyphone|*","href=" + chr(34) + "tel:"+replace(StripHTML(companyphone)," ",""), 1, -1, 1)
+	templateHTML = Replace(templateHTML,"href = " + chr(34) + "tel:*|companyphone|*","href=" + chr(34) + "tel:" + replace(StripHTML(companyphone)," ",""), 1, -1, 1)
 	templateHTML = Replace(templateHTML,"*|companyphone|*",companyphone, 1, -1, 1)
 	templateHTML = Replace(templateHTML,"*|companyphone_v|*",companyphone_v, 1, -1, 1)
 	templateHTML = Replace(templateHTML,"*|companyfax|*",companyfax, 1, -1, 1)
 	templateHTML = Replace(templateHTML,"*|companyfax_v|*",companyfax_v, 1, -1, 1)
-	templateHTML = Replace(templateHTML,"href=" + chr(34) + "*|companyurl|*","href=" + chr(34) + replace(StripHTML(companyurl)," ",""),1,-1,1)
-	templateHTML = Replace(templateHTML,"href =" + chr(34) + "*|companyurl|*","href=" + chr(34) + replace(StripHTML(companyurl)," ",""),1,-1,1)
-	templateHTML = Replace(templateHTML,"href= " + chr(34) + "*|companyurl|*","href=" + chr(34) + replace(StripHTML(companyurl)," ",""),1,-1,1)
-	templateHTML = Replace(templateHTML,"href = " + chr(34) + "*|companyurl|*","href=" + chr(34) + replace(StripHTML(companyurl)," ",""),1,-1,1)
+	templateHTML = Replace(templateHTML,"href=" + chr(34) + "*|companyurl|*","href=" + chr(34) + replace(StripHTML(companyurl)," ",""), 1, -1, 1)
+	templateHTML = Replace(templateHTML,"href =" + chr(34) + "*|companyurl|*","href=" + chr(34) + replace(StripHTML(companyurl)," ",""), 1, -1, 1)
+	templateHTML = Replace(templateHTML,"href= " + chr(34) + "*|companyurl|*","href=" + chr(34) + replace(StripHTML(companyurl)," ",""), 1, -1, 1)
+	templateHTML = Replace(templateHTML,"href = " + chr(34) + "*|companyurl|*","href=" + chr(34) + replace(StripHTML(companyurl)," ",""), 1, -1, 1)
 	templateHTML = Replace(templateHTML,"*|companyurl|*",companyurl, 1, -1, 1)
 	templateHTML = Replace(templateHTML,"*|companyurl_v|*",companyurl_v, 1, -1, 1)
 	templateHTML = Replace(templateHTML,"*|address|*",address, 1, -1, 1)
@@ -1319,61 +1319,61 @@ IF LEN(templateFilePath) > 0 THEN
 	templateHTML = Replace(templateHTML,"*|xmastext|*",xmastext, 1, -1, 1)
 	templateHTML = Replace(templateHTML,"*|xmastext_v|*",xmastext_v, 1, -1, 1)
 	templateHTML = Replace(templateHTML,"*|xmastext_t|*",xmastext_t, 1, -1, 1)
-	templateHTML = Replace(templateHTML,"href=" + chr(34) + "*|webpage|*","href=" + chr(34) + StripHTML(webpage),1,-1,1)
-	templateHTML = Replace(templateHTML,"href =" + chr(34) + "*|webpage|*","href=" + chr(34) + StripHTML(webpage),1,-1,1)
-	templateHTML = Replace(templateHTML,"href= " + chr(34) + "*|webpage|*","href=" + chr(34) + StripHTML(webpage),1,-1,1)
-	templateHTML = Replace(templateHTML,"href = " + chr(34) + "*|webpage|*","href=" + chr(34) + StripHTML(webpage),1,-1,1)
+	templateHTML = Replace(templateHTML,"href=" + chr(34) + "*|webpage|*","href=" + chr(34) + StripHTML(webpage), 1, -1, 1)
+	templateHTML = Replace(templateHTML,"href =" + chr(34) + "*|webpage|*","href=" + chr(34) + StripHTML(webpage), 1, -1, 1)
+	templateHTML = Replace(templateHTML,"href= " + chr(34) + "*|webpage|*","href=" + chr(34) + StripHTML(webpage), 1, -1, 1)
+	templateHTML = Replace(templateHTML,"href = " + chr(34) + "*|webpage|*","href=" + chr(34) + StripHTML(webpage), 1, -1, 1)
 	templateHTML = Replace(templateHTML,"*|webpage|*",webpage, 1, -1, 1)
 	templateHTML = Replace(templateHTML,"*|webpage_v|*",webpage_v, 1, -1, 1)
-	templateHTML = Replace(templateHTML,"href=" + chr(34) + "*|href|*","href=" + chr(34) + StripHTML(href),1,-1,1)
-	templateHTML = Replace(templateHTML,"href =" + chr(34) + "*|href|*","href=" + chr(34) + StripHTML(href),1,-1,1)
-	templateHTML = Replace(templateHTML,"href= " + chr(34) + "*|href|*","href=" + chr(34) + StripHTML(href),1,-1,1)
-	templateHTML = Replace(templateHTML,"href = " + chr(34) + "*|href|*","href=" + chr(34) + StripHTML(href),1,-1,1)
+	templateHTML = Replace(templateHTML,"href=" + chr(34) + "*|href|*","href=" + chr(34) + StripHTML(href), 1, -1, 1)
+	templateHTML = Replace(templateHTML,"href =" + chr(34) + "*|href|*","href=" + chr(34) + StripHTML(href), 1, -1, 1)
+	templateHTML = Replace(templateHTML,"href= " + chr(34) + "*|href|*","href=" + chr(34) + StripHTML(href), 1, -1, 1)
+	templateHTML = Replace(templateHTML,"href = " + chr(34) + "*|href|*","href=" + chr(34) + StripHTML(href), 1, -1, 1)
     templateHTML = Replace(templateHTML,"*|IDnumber|*",IDnumber, 1, -1, 1)	
 	templateHTML = Replace(templateHTML,"*|IDnumber_v|*",IDnumber_v, 1, -1, 1)
 	templateHTML = Replace(templateHTML,"*|extranote|*",extranote,1 , -1 , 1)
 	templateHTML = Replace(templateHTML,"*|extranote_v|*",extranote_v, 1, -1, 1)
 	templateHTML = Replace(templateHTML,"*|extranote_t|*",extranote_t, 1, -1, 1)
 	templateHTML = Replace(templateHTML,"*|notes|*",notes, 1, -1, 1)
-	templateHTML = Replace(templateHTML,"*|notes_v|*",notes_v,1,-1,1)
+	templateHTML = Replace(templateHTML,"*|notes_v|*",notes_v, 1, -1, 1)
 	templateHTML = Replace(templateHTML,"*|footertext|*",footertext, 1, -1, 1)
-	templateHTML = Replace(templateHTML,"*|footertext_v|*",footertext_v, 1, -1 ,1)
+	templateHTML = Replace(templateHTML,"*|footertext_v|*",footertext_v, 1, -1 , 1)
 	templateHTML = Replace(templateHTML,"*|socialicons_v|*",socialicons_v, 1, -1, 1)
 
 	
 	if len(XmasOverWriteColor) > 0 and len(xmashighlight) > 0 then 
 	   
-	   if instr(lcase(XmasOverWriteColor),"linkwwwcolor") > 0 then templateHTML = Replace(templateHTML,"*|LinkWWWColor|*",xmashighlight,1,-1,1)
-	   if instr(lcase(XmasOverWriteColor),"textcolorhighlight") > 0 then templateHTML = Replace(templateHTML,"*|TextColorHighlight|*",xmashighlight,1,-1,1)
+	   if instr(lcase(XmasOverWriteColor) ,"linkwwwcolor") > 0 then templateHTML = Replace(templateHTML ,"*|LinkWWWColor|*" ,xmashighlight, 1, -1, 1)
+	   if instr(lcase(XmasOverWriteColor) ,"textcolorhighlight") > 0 then templateHTML = Replace(templateHTML ,"*|TextColorHighlight|*" ,xmashighlight, 1, -1, 1)
 	   
 	   AddDebug "Overwite with Xmas Color :" & XmasOverWriteColor &" = " & xmashighlight
 	end if
-	templateHTML = Replace(templateHTML,"*|LinkWWWColor|*",LinkWWWColor,1,-1,1)
-	templateHTML = Replace(templateHTML,"*|SymbolColor|*",SymbolColor,1,-1,1)
+	templateHTML = Replace(templateHTML ,"*|LinkWWWColor|*" ,LinkWWWColor, 1, -1, 1)
+	templateHTML = Replace(templateHTML ,"*|SymbolColor|*" ,SymbolColor, 1, -1, 1)
 	
-	templateHTML = Replace(templateHTML,"*|TextColor|*",TextColor,1,-1,1)
+	templateHTML = Replace(templateHTML ,"*|TextColor|*",TextColor, 1, -1, 1)
 	
-	templateHTML = Replace(templateHTML,"*|TextColorHighlight|*",TextColorHighlight,1,-1,1)
-	templateHTML = Replace(templateHTML,"*|TextFooterColor|*",TextFooterColor,1,-1,1)
-	templateHTML = Replace(templateHTML,"*|BarColor|*",BarColor,1,-1,1)
-	templateHTML = Replace(templateHTML,"*|HyperlinkColor|*",HyperlinkColor,1,-1,1)
-	templateHTML = Replace(templateHTML,"*|DefaultFont|*",DefaultFont,1,-1,1)
-	templateHTML = Replace(templateHTML,"*|DefaultLineHeight|*",DefaultLineHeight,1,-1,1)
-	templateHTML = Replace(templateHTML,"*|DefaultFontSize|*",DefaultFontSize,1,-1,1)
-	templateHTML = Replace(templateHTML,"*|LargerFontSize|*",LargerFontSize,1,-1,1)
+	templateHTML = Replace(templateHTML ,"*|TextColorHighlight|*" ,TextColorHighlight, 1, -1, 1)
+	templateHTML = Replace(templateHTML ,"*|TextFooterColor|*" ,TextFooterColor, 1, -1, 1)
+	templateHTML = Replace(templateHTML ,"*|BarColor|*" ,BarColor, 1, -1, 1)
+	templateHTML = Replace(templateHTML ,"*|HyperlinkColor|*" ,HyperlinkColor, 1, -1, 1)
+	templateHTML = Replace(templateHTML ,"*|DefaultFont|*" ,DefaultFont, 1, -1, 1)
+	templateHTML = Replace(templateHTML ,"*|DefaultLineHeight|*" ,DefaultLineHeight, 1, -1, 1)
+	templateHTML = Replace(templateHTML ,"*|DefaultFontSize|*" ,DefaultFontSize, 1, -1, 1)
+	templateHTML = Replace(templateHTML ,"*|LargerFontSize|*" ,LargerFontSize, 1, -1, 1)
 	
 	' If using the imagename variable, then update the HTML code
 	if len(imagename) then 
-		templateHTML = Replace(templateHTML,"*|imagename|*",imagename,1,-1,1)
+		templateHTML = Replace(templateHTML, "*|imagename|*" ,imagename, 1, -1, 1)
 	else
 		' If the template is using the imagename variable but not defined then make it up
 		AddDebug "Set Variable :imagename 'Auto' -> " & SignatureName&"."& DefaultImageType
-        templateHTML = Replace(templateHTML,"*|imagename|*",SignatureName&"." & DefaultImageType,1,-1,1)
+        templateHTML = Replace(templateHTML, "*|imagename|*", SignatureName&"." & DefaultImageType, 1, -1, 1)
 	end if
 
     ' Modify the Width and Height in the HTML code
-	templateHTML = Replace(templateHTML,"*|width|*",SignatureWidth,1,-1,1)
-    templateHTML = Replace(templateHTML,"*|height|*",SignatureHeight,1,-1,1)
+	templateHTML = Replace(templateHTML,"*|width|*",SignatureWidth, 1, -1, 1)
+    templateHTML = Replace(templateHTML,"*|height|*",SignatureHeight, 1, -1, 1)
 
 	IF MaxSocialIcons > 0 then 
 		Socialtmpname=SignatureName
@@ -1384,9 +1384,9 @@ IF LEN(templateFilePath) > 0 THEN
 		dim si
 		si = 1
 		do
-			templateHTML = Replace(templateHTML,"*|" + SocialIcon(si) + "|*",Socialtmpname & "-" & SocialIcon(si) & "." & DefaultImageType,1,-1,1)		
-			templateHTML = Replace(templateHTML,"*|" + SocialIcon(si) + "Link|*",SocialIconLink(si),1,-1,1)		
-			templateHTML = Replace(templateHTML,"*|" + SocialIcon(si) + "Alt|*",SocialIconAlt(si),1,-1,1)		
+			templateHTML = Replace(templateHTML,"*|" + SocialIcon(si) + "|*",Socialtmpname & "-" & SocialIcon(si) & "." & DefaultImageType, 1, -1, 1)		
+			templateHTML = Replace(templateHTML,"*|" + SocialIcon(si) + "Link|*",SocialIconLink(si), 1, -1, 1)		
+			templateHTML = Replace(templateHTML,"*|" + SocialIcon(si) + "Alt|*",SocialIconAlt(si), 1, -1, 1)		
 			si = si + 1
 		loop until si > MaxSocialIcons
 	END IF
@@ -1623,7 +1623,7 @@ Function ChangeDomain(byval email, newdomainname)
 	ChangeDomain = ""
 
 	' Add an @ to the newdomainname if it does not have one.
-	if left(newdomainname,1) <> "@" then newdomainname = "@" + newdomainname
+	if left(newdomainname, 1) <> "@" then newdomainname = "@" + newdomainname
 
 	' Remove the lastname from the email address
 	p1 = instr(email, "@")
@@ -1666,7 +1666,7 @@ Function ReadDefaultSettings(CheckDefault, headerHTML)
 	do
     a = instr(b,headerHTML,"<*|"+CheckDefault+"|*")
     IF a then 
-		strQuote= mid(headerHTML, a + d + 1,1)
+		strQuote= mid(headerHTML, a + d + 1, 1)
 		'if the value starts with a ' then search for the closing end as well
 		if strQuote = "'" then 
 	        if mid(headerHTML, a + d + 1, 3) ="''>" then 
@@ -1691,7 +1691,7 @@ Function ReadDefaultSettings(CheckDefault, headerHTML)
 			if strText <> string(len(strText),"*") then 
 				ReadDefaultSettings = strText
 				if len(ReadDefaultSettings) > 3 then 
-					if left(ReadDefaultSettings,1) = "'" and right(ReadDefaultSettings,1) = "'" then 
+					if left(ReadDefaultSettings, 1) = "'" and right(ReadDefaultSettings, 1) = "'" then 
 						ReadDefaultSettings = mid(ReadDefaultSettings, 2, len(ReadDefaultSettings) - 2)
 					Else
 						' interpret the {...} EG: HTML code and replace with the equavilent <...> EG: <DIV> </DIV> etc..
@@ -1741,7 +1741,7 @@ Sub AddDebug(strText)
 		
 		Set debugfile = fileSystem.openTextFile(signaturesFolderPath&"debug.txt", 8, True)    
 		if len(strText) then 
-			if left(strText,1) <> "*" then strText = FormatDateTime(Now, vbShortTime) + " " + strText
+			if left(strText, 1) <> "*" then strText = FormatDateTime(Now, vbShortTime) + " " + strText
 		END IF
 		strText = replace(strText, vbCrLf, " ")
 		debugfile.WriteLine(strText)
@@ -1885,15 +1885,15 @@ Sub UpdateGlobalVarsFromAD()
 		end if
 		if instr(notes,"-office") then 
 			notes=replace(notes,"-office","")
-			office=""
+			office= ""
 		end if
 		if instr(notes,"-pobox") then 
 			notes=replace(notes,"-pobox","")
-			pobox=""
+			pobox= ""
 		end if
 		if instr(notes,"-title") then 
-			title=""
-			ADtitle=""
+			title= ""
+			ADtitle= ""
 		end if
 		
 		if instr(notes,"-lastname") then 
@@ -2023,7 +2023,7 @@ End function
 Function GetOutlookSignatureHtml(byval templateFilePath)
 
 	' Read the Users Signature File
-    GetOutlookSignatureHtml =""
+    GetOutlookSignatureHtml = ""
     on error resume next
 
     if len(templateFilePath) > 0 then     
@@ -2255,11 +2255,11 @@ Function CreateIDNumber(strUserName)
 	
 	' Create a user unique number based on the users username
 	DIM j, ch, ID
-	ID=""
+	ID= ""
 
 	if len(strUserName) > 0 then 
 		for j = 1 to len(strUserName)
-			ch=hex(asc(mid(strUserName,j,1)))
+			ch=hex(asc(mid(strUserName,j, 1)))
 			ID=ID+cstr(ch)
 		Next
 		'AddDebug "IDnumber : " & ID
@@ -2328,8 +2328,8 @@ Sub CreateVcard(ByVal signaturesFolderPath, ByVal SignatureName)
 	end if
 	if len(email) then vCard=vCard +"EMAIL;PREF;INTERNET:" + StripHTML(email) + VbCrLf
 	if len(vcardPhoto) then vCard=vCard +"PHOTO;TYPE=JPEG;ENCODING=BASE64:" + VbCrLf + vcardPhoto + VbCrLf+ VbCrLf
-	vCard=vCard + "X-MS-OL-DESIGN;CHARSET=utf-8:<card xmlns=""http://schemas.microsoft.com/office/outlook/12/electronicbusinesscards"" ver=""1.0"" layout=""left"" bgcolor=""ffffff""><img xmlns="""" align=""fit"" area=""16"" use=""cardpicture""/>" +VbCrLf
-	VCard=VCard + "<fld xmlns="""" prop=""name"" align=""left"" dir=""ltr"" style=""b"" color=""000000"" size=""10""/><fld xmlns="""" prop=""org"" align=""left"" dir=""ltr"" color=""000000"" size=""8""/><fld xmlns="""" prop=""title"" align=""left"" dir=""ltr"" color=""000000"" size=""8""/><fld xmlns="""" prop=""telwork"" align=""left"" dir=""ltr"" color=""d48d2a"" size=""8""><label align=""right"" color=""626262"">Work</label></fld><fld xmlns="""" prop=""telcell"" align=""left"" dir=""ltr"" color=""d48d2a"" size=""8""><label align=""right"" color=""626262"">Mobile</label></fld><fld xmlns="""" prop=""email"" align=""left"" dir=""ltr"" color=""d48d2a"" size=""8""/><fld xmlns="""" prop=""addrwork"" align=""left"" dir=""ltr"" color=""000000"" size=""8""/><fld xmlns="""" prop=""webwork"" align=""left"" dir=""ltr"" color=""000000"" size=""8""/><fld xmlns="""" prop=""blank"" size=""8""/><fld xmlns="""" prop=""blank"" size=""8""/><fld xmlns="""" prop=""blank"" size=""8""/><fld xmlns="""" prop=""blank"" size=""8""/><fld xmlns="""" prop=""blank"" size=""8""/><fld xmlns="""" prop=""blank"" size=""8""/><fld xmlns="""" prop=""blank"" size=""8""/><fld xmlns="""" prop=""blank"" size=""8""/></card>" + VbCrLf
+	vCard=vCard + "X-MS-OL-DESIGN;CHARSET=utf-8:<card xmlns= ""http://schemas.microsoft.com/office/outlook/12/electronicbusinesscards"" ver= ""1.0"" layout= ""left"" bgcolor= ""ffffff""><img xmlns= """" align= ""fit"" area= ""16"" use= ""cardpicture""/>" +VbCrLf
+	VCard=VCard + "<fld xmlns= """" prop= ""name"" align= ""left"" dir= ""ltr"" style= ""b"" color= ""000000"" size= ""10""/><fld xmlns= """" prop= ""org"" align= ""left"" dir= ""ltr"" color= ""000000"" size= ""8""/><fld xmlns= """" prop= ""title"" align= ""left"" dir= ""ltr"" color= ""000000"" size= ""8""/><fld xmlns= """" prop= ""telwork"" align= ""left"" dir= ""ltr"" color= ""d48d2a"" size= ""8""><label align= ""right"" color= ""626262"">Work</label></fld><fld xmlns= """" prop= ""telcell"" align= ""left"" dir= ""ltr"" color= ""d48d2a"" size= ""8""><label align= ""right"" color= ""626262"">Mobile</label></fld><fld xmlns= """" prop= ""email"" align= ""left"" dir= ""ltr"" color= ""d48d2a"" size= ""8""/><fld xmlns= """" prop= ""addrwork"" align= ""left"" dir= ""ltr"" color= ""000000"" size= ""8""/><fld xmlns= """" prop= ""webwork"" align= ""left"" dir= ""ltr"" color= ""000000"" size= ""8""/><fld xmlns= """" prop= ""blank"" size= ""8""/><fld xmlns= """" prop= ""blank"" size= ""8""/><fld xmlns= """" prop= ""blank"" size= ""8""/><fld xmlns= """" prop= ""blank"" size= ""8""/><fld xmlns= """" prop= ""blank"" size= ""8""/><fld xmlns= """" prop= ""blank"" size= ""8""/><fld xmlns= """" prop= ""blank"" size= ""8""/><fld xmlns= """" prop= ""blank"" size= ""8""/></card>" + VbCrLf
 	vCard=vCard +"REV:VCARD" + VbCrLf
 	vCard=vCard +"END:VCARD"
 
@@ -2391,7 +2391,7 @@ Function ProperCase(byval Inn)
 	'Txt = StrConv(Txt, vbProperCase)
 	if len(Txt) > 0 then 
 		Txt = ltrim(Txt)
-		Txt = ucase(left(Txt,1)) + mid(Txt,2,len(Txt))
+		Txt = ucase(left(Txt, 1)) + mid(Txt,2,len(Txt))
 	end if
 	
 	'---------------O'Neal Etc------------
@@ -2484,7 +2484,7 @@ Function PhoneNumber (byval strPhone)
 		newnum = tmpNumber
 	    if left(tmpNumber,4) ="1300" then newnum = left(tmpNumber,4)+" "+mid(tmpNumber,5,3)+" "+mid(tmpNumber,8,3)
 		if left(tmpNumber,4) ="1800" then newnum = left(tmpNumber,4)+" "+mid(tmpNumber,5,3)+" "+mid(tmpNumber,8,3)
-		if left(tmpNumber,1)="0" then newnum = left(tmpNumber,2)+" " + mid(tmpNumber,3,4)+" " +mid(tmpNumber, 7,4)
+		if left(tmpNumber, 1)="0" then newnum = left(tmpNumber,2)+" " + mid(tmpNumber,3,4)+" " +mid(tmpNumber, 7,4)
 		PhoneNumber = newnum
 	else
 	    if left(tmpNumber,2) ="13" then 
@@ -2504,7 +2504,7 @@ Function PhoneINTNumber (byval strPhone)
 	tmpNumber=replace(tmpNumber,"-","")
 	if len(tmpNumber) = 10 then 
 		newnum = tmpNumber
-	    if left(tmpNumber,1)="0" then newnum = InternationalPrefix+" " +mid(tmpNumber,2,1)+" " + mid(tmpNumber,3,4)+" " +mid(tmpNumber, 7,4)
+	    if left(tmpNumber, 1)="0" then newnum = InternationalPrefix+" " +mid(tmpNumber,2, 1)+" " + mid(tmpNumber,3,4)+" " +mid(tmpNumber, 7,4)
 		PhoneINTNumber = newnum
 	else
 		PhoneINTNumber = strPhone
@@ -2520,7 +2520,7 @@ Function MobileNumber (byval strMobile)
 	
 	if len(tmpNumber) = 10 then 
 		newnum = tmpNumber
-		if left(tmpNumber,1)="0" then newnum = left(tmpNumber,4)+" " + mid(tmpNumber,5,3)+" " +mid(tmpNumber, 8,3)
+		if left(tmpNumber, 1)="0" then newnum = left(tmpNumber,4)+" " + mid(tmpNumber,5,3)+" " +mid(tmpNumber, 8,3)
 		MobileNumber = newnum
 	else
 		MobileNumber = strMobile
@@ -2534,7 +2534,7 @@ Function MobileINTNumber (byval strMobile)
 	tmpNumber=replace(tmpNumber,"-","")
 	if len(tmpNumber) = 10 then 
 		newnum = tmpNumber
-		if left(tmpNumber,1)="0" then newnum = InternationalPrefix+" "+mid(tmpNumber,2,3)+" " + mid(tmpNumber,5,3)+" " +mid(tmpNumber, 8,3)
+		if left(tmpNumber, 1)="0" then newnum = InternationalPrefix+" "+mid(tmpNumber,2,3)+" " + mid(tmpNumber,5,3)+" " +mid(tmpNumber, 8,3)
 		MobileINTNumber = newnum
 	else
 		MobileINTNumber = strMobile
@@ -3062,7 +3062,7 @@ function DNSLookup(strComputer)
 			END IF
 		END IF
 	END IF
-	if result ="" then 
+	if result = "" then 
 		AddDebug("NSLOOKUP " & strName & " | " & strNsErr & " | " & strNslookup & " | " & result)
 	Else
 		AddDebug("NSLOOKUP " & strName & " " & result & " - OK")
