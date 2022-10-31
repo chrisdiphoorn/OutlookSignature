@@ -1,13 +1,13 @@
 # OutlookSignature
 Automatically Create Outlook Signatures on Windows Workstations based on Active Directory User Group Membership
 
-Place the CreateSignatures.vbs, CreateSignatures.wsf, SignatureDefaults.vbs, SignatureFunctions.vbs files into a Shared Folder EG: \\\ServerName\FileShare
-Place the SIGNATURE.tpl, SIGNATURE-Xmas.tpl and any Images file into a WEB Server which only needs to be accessable from the internal Network.
-Update the SignatureDefaults.vbs file with the Relevant ADDomain, SourceFilesURL, LDAPurl details.
-	ADDomain is the Base DN Path where DC = Domain Component. Use Active Directory Users and Computers. Select View, Advanced Features, Then get the properties of the first entry, and select Attribute Editor. The DN path will be shown in the distinguishedName Attribute. You can edit it and copy the value.
+Place the CreateSignatures.vbs, CreateSignatures.wsf, SignatureDefaults.vbs, SignatureFunctions.vbs files into a Shared Folder EG: \\\ServerName\FileShare</br>
+Place the SIGNATURE.tpl, SIGNATURE-Xmas.tpl and any Images file into a WEB Server which only needs to be accessable from the internal Network.</br>
+Update the SignatureDefaults.vbs file with the Relevant ADDomain, SourceFilesURL, LDAPurl details.</br>
+	ADDomain is the Base DN Path where DC = Domain Component. Use Active Directory Users and Computers. Select View, Advanced Features, Then get the properties of the first entry, and select Attribute Editor. The DN path will be shown in the distinguishedName Attribute. You can edit it and copy the value.</br>
 
 Update the SIGNATURE.tpl file. Rename the File to reflect the Company Name. + Also update the contents of the file with the relevenat details and settings.
-NOTE: The Heading Text of the File needs to include the Name of the file. If the script does not find the name of the tpl file insdie it, it wont run.
+NOTE: The Heading Text of the File needs to include the Name of the file. If the script does not find the name of the tpl file insdie it, it wont run.</br>
 
 NB: The HTML code is Outlook HTML 1.0 so it does not support the newer HTML commands.
 Each .tpl file is split up into 2 main sections. The Signature Variables & Settings ( Set Between the {<!-- -->}) , and the Signature HTML Code.
