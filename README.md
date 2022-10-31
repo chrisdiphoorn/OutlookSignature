@@ -22,13 +22,13 @@ HTML, TEXT, VCF Outlook Signature Files will be created in the users \%appdata%\
 
 Any Images associated with the Signature will also be copied in to the signatures folder. If the DefaultImageType is set to png then the SignatureName.png is automatically copied. Use the AdditionalImage settings to copy other image files.
 
-Enable the Debug True in the tpl file to also create a debug.txt file that creates information on what settings were set and modified in each signature.
+Set Debug=True in the tpl file to create a 'debug.txt' file that information on what settings were set and modified in each signature.
 
 **DEFAULT VALUES**
 
 	Bracket Values are automatically changed like {div} {/div} = replaced with <div> </div> but only if the line does not start and end like '...'
 	'.......'> Values = Remove the '' from either end. Searches for '> or ' > to determine the end of the Line.
-	Address		(Vbcr) chr(13) are removed 
+	Address		(Vbcr) chr(13) are removed from the value.
 	FooterText	^ are replaced with <p>....</p> as long as the initial value does not orginally contain any <p> HTML statements.
 
 **ACTIVE DIRECTORY**
