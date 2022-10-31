@@ -8,13 +8,13 @@
  <*|Debug|*True>
  <*|InternationalPrefix|*+61>	 
  <*|Company|*SIGNATURE>					
- <*|CompanyPhone|*07 5518 8881>							
+ <*|CompanyPhone|*07 5555 5555>							
  <*|CompanyFax|*>							
  <*|CompanyURL|*SIGNATURE.com> 	
  <*|DefaultCompany|*SIGNATURE>
- <*|DefaultPOBox|*PO Box xxx, Gold Coast>
+ <*|DefaultPOBox|*PO BOX xxx, Brisbane, QLD 4000>
  <*|DefaultPhone|*07 XXXX XXXX>			
- <*|DefaultAddress|*Marina via The Concourse,^A Street^Gold Coast QLD 4217>	
+ <*|DefaultAddress|*Unit 1 ,^Number at Street Name^Suburb, QLD 4000>	
  <*|DefaultFax|*>			
  <*|DefaultEmailDomain|*SIGNATURE.COM.AU>	
  <*|DefaultWWW|*SIGNATURE.com> 
@@ -25,8 +25,8 @@
  <*|XmasText|*Our office will be closed from 4.00pm on *|lastday|* We will be reopen at 8:30am on *|firstday|* with only sales staff operating from *|firstmonday|*.>
  <*|XmasHighlightColor|*#C67D5B>
  <*|XmasImageName|*SIGNATURE-Xmas.png>
- <*|ReplaceEmail|*@SIGNATURE.com.au, @OLDdomain.com.au>
- <*|FooterText|*SIGNATURE will be closed from COB *|lastday|*, reopening on *|firstday|*. We would like to take this opportunity to thank you for your continuing support during *|xmasstartyear|* and we look forward to working with you again in *|xmasfinishyear|*>
+ <*|ReplaceEmail|*@SIGNATURE.com.au, @PREVIOUSDomainName.com.au>
+ <*|FooterText|*COMPANYNAME will be closed from COB *|lastday|*, reopening on *|firstday|*. We would like to take this opportunity to thank you for your continuing support during *|xmasstartyear|* and we look forward to working with you again in *|xmasfinishyear|*>
  
  <*|DefaultImageType|*png> 
  <*|AddPhoneSpace|*True>
