@@ -140,7 +140,10 @@ DIM TransformTitle, TransformName, TransformState, TransformPhone, TransformMobi
 DIM AutoPOBox
 DIM Variable(100), VariableValue(100)
 DIM MaxVariables
-DIM InsertHTML(100), InsertHTMLCode(100), InsertHTMLFind(100), MaxInsertHTML, FindInsertHTML, FindInsertHTMLCode, FindInsertHTMLFind, tmpInsertHTML
+DIM InsertHTML(100), InsertHTMLCode(100), InsertHTMLFind(100), 
+
+
+HTML, FindInsertHTML, FindInsertHTMLCode, FindInsertHTMLFind, tmpInsertHTML
 DIM EncodeImage(20), EncodeImageData(20), EncodeImageVariable(20), MaxEncodeImage, FindEncodeImage
 DIM tmpPhone, tmpCompanyPhone
 DIM RemoveCompanyPhone, AdminDefaultSignature
@@ -152,7 +155,7 @@ DIM LinkWWWColor, SymbolColor, TextColor, TextColorHighlight, TextFooterColor, B
 DIM TestXmas, XmasOverWriteColor, xmashighlight, xmasoverwrite, xmassignature, IsXmas, AutoXmas, FirstMonday, TestXmasDate, XmasStartYear, XmasFinishYear, XmasDay, XmasAdjust
 DIM findTitle, findAddress, findSignature, checkpos, FindName
 DIM ExtraFile(50), MaxExtraFile, FindExtraFile
-
+DIM XmasImageSwap(100), MaxXmasImageSwap, FindImageSwap 
 
 Function GetSignatureGroups (aSignatureGroupName)
 	DIM A, objGroup
@@ -874,6 +877,19 @@ IF LEN(templateFilePath) > 0 THEN
 		if MaxInsertHTML > 1 then FindInsertHTML = FindInsertHTML + "s"  'Cause it looks better in debug!
 		if MaxInsertHTML then AddDebug "Found " & cstr(MaxInsertHTML) & " " & FindInsertHTML
 		
+		' Find ImageSwap
+		MaxXmasImageSwap = 0
+		Do
+			FindXmasSwap = ReadDefaultSettings("XmasImageSwap", headerHTML)
+			if FindXmasSwap <>"" then 
+				MaxXmasImageSwap=MaxXmasImageSwap + 1
+				XmasImageSwap(MaxXmasImageSwap) = FindXmasSwap
+			end if
+		LOOP until FindXmasSwap = "" or MaxXmasImageSwap= 100
+		FindXmasSwap = "XmasImage Swap"
+		if MaxXmasImageSwap > 1 then FindXmasSwap = FindXmasSwap + "s"  'Cause it looks better in debug!
+		if MaxXmasImageSwap > 0 then AddDebug "Found " & cstr(MaxXmasImageSwap) & " " & FindXmasSwap
+		
 		' Find Combine and CombineHTML
 		MaxCombine = 0
 		Do
@@ -1024,7 +1040,8 @@ IF LEN(templateFilePath) > 0 THEN
 		notes_v	= IIF(notes = "", DisplayNone, "")
 		footertext_v = IIF(footertext = "", DisplayNone, "")
 	else
-		' Hiding Tables using these vales if blank
+		' 
+		Tables using these vales if blank
 		xmastext_t = IIF(xmastext = "", "hidden", chr(34)+chr(34))
 		extranote_t = IIF(extranote = "", "hidden", chr(34)+chr(34))
 		xmastext_v = IIF(xmastext = "", "hidden", chr(34)+chr(34))
@@ -1036,6 +1053,22 @@ IF LEN(templateFilePath) > 0 THEN
 		socialicons_v = chr(34) + chr(34)
 	end if
 	
+	Dim ImageSwap, FindSwap, WithSwap
+	IF MaxXmasImageSwap > 0 Then
+		AddDebug "Modifying " + cstr(MaxXmasImageSwap)+" Image Names"
+		Do
+			ImageSwap = split(XmasImageSwap(MaxXmasImageSwap),",")
+			if ubound(ImageSwap) > 0 then 
+				FindSwap = ImageSwap(0)
+				WithSwap = ImageSwap(1)
+				if len(FindSwap) > 0 and len(WithSwap) > 0 then 
+					AddDebug("Mofifying Image " + FindSwap+" -> " + WithSwap)
+					templateHTML = Replace(templateHTML,FindSwap, WithSwap,1,-1,1)
+				end if
+			end if
+			MaxXmasImageSwap = MaxXmasImageSwap -1
+		LOOP until MaxXmasImageSwap <= 0
+	END IF
 	
 	
 	' Modify values with HTML code
