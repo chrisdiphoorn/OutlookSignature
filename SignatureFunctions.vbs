@@ -640,6 +640,10 @@ IF LEN(templateFilePath) > 0 THEN
 					xmastext = Replace(xmastext,"*|lastday|*", DateExpanded(XmasLastDay))
 					AddDebug "Mod Variable :xmastext 'Update *|lastday|*' -> '" & xmastext &"'"
 				END IF
+				if instr(xmastext,"*|firstholiday|*") > 0 then 
+					xmastext = Replace(xmastext,"*|firstholiday|*", DateExpanded2(DateAddDay(XmasLastDay, 1)))
+					AddDebug "Mod Variable: firstholiday 'Update *|firstholiday|*' -> '" & xmastext &"'"
+				END IF
 				if instr(xmastext,"*|firstmonday|*") > 0 then 
 					xmastext = Replace(xmastext,"*|firstmonday|*", DateExpanded(preMonday))
 					AddDebug "Mod Variable :xmastext 'Update *|firstmonday|* -> '" & xmastext &"'"
@@ -647,6 +651,10 @@ IF LEN(templateFilePath) > 0 THEN
 				if instr(xmastext,"*|firstday|*") > 0 then 
 					xmastext = Replace(xmastext,"*|firstday|*", DateExpanded(NewMonday)) 
 					AddDebug "Mod Variable :xmastext 'Update *|firstday|*' -> '" & xmastext &"'"
+				END IF
+				if instr(xmastext,"*|resumeday|*") > 0 then 
+					xmastext = Replace(xmastext,"*|resumeday|*", DateExpanded2(XmasTo) )
+					AddDebug "Mod Variable: xmastext 'Update *|resumeday|*' -> '" & xmastext &"'"
 				END IF
 				if instr(xmastext,"{lastday}") > 0 then 
 					xmastext = Replace(xmastext,"{lastday}", DateExpanded(XmasLastDay))
@@ -660,7 +668,10 @@ IF LEN(templateFilePath) > 0 THEN
 					xmastext = Replace(xmastext,"{firstday}", DateExpanded(NewMonday)) 
 					AddDebug "Mod Variable :xmastext 'Update {firstday}' -> '" & xmastext &"'"
 				END IF
-				
+				if instr(xmastext,"{firstholiday}") > 0 then 
+					xmastext = Replace(xmastext,"{firstholiday}", DateExpanded2(DateAddDay(XmasLastDay, 1)))
+					AddDebug "Mod Variable: firstholiday 'Update {firstholiday}' -> '" & xmastext &"'"
+				END IF
 				xmashighlight = ReadDefaultSettings("XmasHighlightColor", headerHTML)  
 				XmasOverWriteColor = ReadDefaultSettings("XmasOverWriteColor", headerHTML)
 				
@@ -2909,6 +2920,14 @@ Function FindSundayinDate(byval dteDate, byval weeknum )
 	
 End Function
 
+Function DateAddDay(byval dteDate, byval intdays)
+
+	DIM Modifyer
+	Modifyer = DateAdd("d", intdays, dteDate)
+	DateAddDay = ConvertToDate(Modifyer)
+
+End Function
+
 Function FindLastDay(byval dteDate, byval extradays)
 
 DIM ChrDay, ChrWeekDay, Modifyer
@@ -3015,6 +3034,15 @@ Function DateExpanded(strDate)
 		DateExpanded = WeekDayName(Weekday(strDate)) + " " & th(Day(strDate)) + " of " + MonthName(Month(strDate)) + " " + cstr(Year(strDate))
 	Else
 		DateExpanded = ""
+	end if
+End Function
+
+Function DateExpanded2(strDate)
+	strDate = ConvertToDate(strDate)
+	if len(strDate) = 10 then 
+		DateExpanded2 = MonthName(Month(strDate)) + " "+ cstr(Day(strDate)) + ", " + cstr(Year(strDate))
+	Else
+		DateExpanded2 = ""
 	end if
 End Function
 
