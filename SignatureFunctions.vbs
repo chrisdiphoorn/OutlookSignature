@@ -1,11 +1,25 @@
-' ============================================================================================
+﻿' ============================================================================================
 ' Author:       Chris Diphoorn 
 ' Create date:  04/12/2019
-' Description:  Create an Users Outlook Email Signature using details from Activedirectory
+' Description:  Create a Users Outlook Email Signature using details from Activedirectory
 '				and a .TPL HTML file.
 ' Engine:		Joiitech Signature Engine	
 ' ============================================================================================
 '
+' 10-10-2023	C.Diphoorn		Added a check LinkFile = True then dont download any files. (But always download the template file!)
+' 02-10-2023	C.Diphoorn		Added Const LinkImages. If True modifies the img src to include the webserver location for the image. Images are not downloaded to the users signature folder.
+' 02-09-2023	C.Diphoorn		Adding support to create SubFolderFiles - CreateSignatureSubFolderFiles
+' 02-09-2023	C.Diphoorn		Adding IFXmasStart and IFXmasFinish checking and remove the HTML from the template if not Xmas
+' 02-09-2023	C.Diphoorn		Adding IFNotXmasStart and IFNotXmasFinish checking and remove the HTML from the template if it is Xmas
+' 01-08-2023	C.Diphoorn		Added the use of a "_Signature.ini" file to be used instead of Active Directory Details.
+' 01-08-2023    C.Diphoorn		Added Function ReadUserInfoFile (strFileName) 
+' 28-02-2023	C.Diphoorn		Remove Multiple Tags <!--XmasStart--> <!--XmasFinish-->
+' 13-03-2023	C.Diphoorn		Added FAILED Message for DateChecking - added dateok variable, removed checktmp
+'								Xmas wont turn on if dateok is false.
+'								Datecheck will fail if users datetime settings are set to American - OK
+' 15/03/2023	C.Diphoorn		Updated true -> True and false -> False
+'
+
 Const ADS_NAME_INITTYPE_DOMAIN = 1
 Const ADS_NAME_INITTYPE_SERVER = 2
 Const ADS_NAME_INITTYPE_GC = 3
@@ -157,9 +171,14 @@ DIM findTitle, findAddress, findSignature, checkpos, FindName
 DIM ExtraFile(50), MaxExtraFile, FindExtraFile
 DIM XmasImageSwap(100), MaxXmasImageSwap, FindImageSwap 
 DIM ManualUser
+DIM DontDeleteSignature
+DIM SignatureAccount, CreateSignatureAccount
+DIM ImageNextNumber: ImageNextNumber = 0
 
 MaxSignatureGroup = 0
-ManualUser = False
+
+' Set this to True to force the script to not use Active Directpry lookup, but use users _Signature.INI file instead.
+ManualUser = False 										
 
 
 Function GetSignatureGroups (aSignatureGroupName)
@@ -181,6 +200,8 @@ Function GetSignatureGroups (aSignatureGroupName)
 		AddDebug "Groups Found : " & cstr(A)
 	end if
 	GetSignatureGroups = A
+	Set objOU = Nothing
+	
 End Function
 
 SUB DeleteSignature(SignatureName)
@@ -237,7 +258,7 @@ Sub CreateSignature(SignatureName, templateFileName)
 	companyurl="": readreplaceemail ="":SocialIconName="":ForceSocialIcon=""
     vcardPhoto ="": FullStateName="": extranote ="":extranote_v ="": membernote =""
 	TransformTitle="":TransformState="":TransformMobile="": TransformName="": TransformPhone="": TransformCity="":TransformCountry=""
-	ForceSignature = False: ForceCreate=False: MaxSocialIcons =0
+	ForceSignature = False: ForceCreate= False: MaxSocialIcons =0
 	AddPhoneSpace = False: AddAddressSpace = False
 	AddAdditionalCitySpace = False: AddAdditionalSuburbSpace= False: AddAdditionalPOBoxSpace = False: AddAdditionalStateSpace = False
 	AddAdditionalAddressSpace = False: AddAdditionalTitleSpace = False: AddAdditionalPrevTitleSpace = False
@@ -250,11 +271,13 @@ Sub CreateSignature(SignatureName, templateFileName)
 	LinkWWWColor="":SymbolColor="":TextColor="":TextColorHighlight="":TextFooterColor="":BarColor="":HyperLinkColor="":DefaultFont="Lucida,sans-serif":DefaultFontSize="11.0pt":LargerFontSize="11.0pt": DefaultLineHeight="11.0pt"
 	TestXmas = False: XmasOverWriteColor ="":xmashighlight ="": xmasoverwrite ="": xmassignature =""
 	findTitle="": findAddress ="": findAddress ="": findSignature =""
-	IsXmas = false: AutoXmas = False: TestXmasDate ="": XmasDay = "": XmasAdjust = 1
+	IsXmas = False: AutoXmas = False: TestXmasDate ="": XmasDay = "": XmasAdjust = 1
 
-    DIM xmasfrom, xmasto, part1, p1, NewMonday, XmasLastDay, XmasNextLastDay, preMonday, NewYearStartWeek, WeeksClosed
+	DIM xmasfrom, xmasto, part1, p1, NewMonday, XmasLastDay, XmasNextLastDay, preMonday, NewYearStartWeek, WeeksClosed
     DIM SignatureImageFolder, templateFilePath, headerHTML, templateHTML,  templateTEXT
-	DIM PreviousInfoFilePath , tmpstring
+	DIM PreviousInfoFilePath , tmpstring, tmpint, tmpchk, dateok
+		
+	DontDeleteSignature = False
 	
 	' Temporary Turn off Debug to get the Create Details
 	use_debug = True
@@ -263,15 +286,19 @@ Sub CreateSignature(SignatureName, templateFileName)
 	
 	AddDebug ""
 	AddDebug "************************************************************************************************************************************"
-	AddDebug "* " & Date & " * " & tmpstring &"Creating Signature " & SignatureName & " using file " & templateFileName
+	AddDebug "* " & Date & " " & Time & " * " & tmpstring &"Creating Signature " & SignatureName & " using file " & templateFileName
 	AddDebug "************************************************************************************************************************************"
     
     ' Create signature folder if it doesn't exist    
 	IF fileSystem.FolderExists(signaturesFolderPathRoot) THEN
 		IF NOT fileSystem.FolderExists(signaturesFolderPath) THEN
-			AddDebug "Creating Users Outlook Signature Folder : " & signaturesFolderPath
 			on error resume next
 			fileSystem.CreateFolder(signaturesFolderPath)
+			IF fileSystem.FolderExists(signaturesFolderPath) THEN
+				AddDebug "Creating Users Outlook Signature Folder : " & signaturesFolderPath & " - OK"
+			ELSE
+				AddDebug "Creating Users Outlook Signature Folder : " & signaturesFolderPath & " - FAILED - Check Permissions?"
+			END IF
 			on error goto 0		   
 		END If
 	END IF
@@ -306,13 +333,60 @@ Sub CreateSignature(SignatureName, templateFileName)
     cdayname = WeekdayName(Weekday(date, 1),False,1)
     cmonthname = MonthName(cmonth)
 
+	
+	' Test DateFormats and Output any Errors in Debug
+	dateok = true
+	IF DateExpanded("25/06/2025") <> "Wednesday 25th of June 2025" then 
+		AddDebug "Date Testing FAILED:       DD/MM/YYYY      25/06/2025   Wednesday 25th of June 2025 -> " + DateExpanded("25/06/2025")
+		dateok = False
+	END IF
+	IF DateExpanded("02/06/2025") <> "Monday 2nd of June 2025" then
+		AddDebug "Date Testing FAILED:       DD/MM/YYYY      02/06/2025   Monday 2nd of June 2025 -> " + DateExpanded("02/06/2025")
+		dateok = False
+	END IF
+	
+	IF DateExpanded2("25/06/2025") <> "June 25, 2025" then
+		AddDebug "Date Testing FAILED:       DD/MM/YYYY      25/06/2025   June 25, 2025 -> " + DateExpanded2("25/06/2025")
+		dateok = False
+	END IF
+	IF DateExpanded2("02/06/2025") <> "June 2, 2025" then
+		AddDebug "Date Testing FAILED:       DD/MM/YYYY      02/06/2025   June 2, 2025 -> " + DateExpanded2("02/06/2025")
+		dateok = False
+	END IF
+	
+	IF DateAddDay("25/06/2025", 1) <> "26/06/2025" THEN 
+		AddDebug "Date Testing FAILED:       Add 1 Day       25/06/2025   26/06/2025 -> " + DateAddDay("25/06/2025", 1)
+		dateok = False
+	END IF 
+	IF DateAddDay("02/06/2025", 1) <> "03/06/2025" THEN 
+		AddDebug "Date Testing: FAILED      Add 1 Day       02/06/2025   03/06/2025 -> " + DateAddDay("02/06/2025", 1)
+		dateok = False
+	END IF
+	
+	IF FindSundayinDate("25/06/2025", 1) <> "01/06/2025" THEN 
+		AddDebug "Date Testing: FAILED      Find 1st Sunday of Month in Date    25/06/2025   01/06/2025 -> " + FindSundayinDate("25/06/2025",1)
+		dateok = False
+	END IF
+	
+	IF FindWeekinDate("25/06/2025", 1) <> "02/06/2025" THEN
+		AddDebug "Date Testing: FAILED      Find 1st Week in Date    25/06/2025   02/06/2025 -> " + FindWeekinDate("25/06/2025", 1)
+		dateok = False
+	END IF
+	
+    IF dateok = true Then
+			AddDebug "Date Checking - OK (Users Datetime format is set to DD/MM/YYYY)"
+		Else
+			AddDebug "Date Checking - WARNING - Check the users workstation DateTime settings are setup correctly for Australia\Phillipines"
+	END IF
+	
+	
     IF ManualUser = True then 
 		IF filesystem.fileexists(signaturesFolderPath + templateFileName) THEN 
 			AddDebug "Using Local FILE " & templateFileName & " FROM " & signaturesFolderPath
 			templateFilePath = signaturesFolderPath + templateFileName
 		END IF
 	ELSE
-		templateFilePath = DownloadFile(templateFileName, sourceFilesUrl, signaturesFolderPath)
+		templateFilePath = DownloadTemplateFile(templateFileName, sourceFilesUrl, signaturesFolderPath)
 	end if
 	
 	' Turn off Debug again and it wil be enabled again if found in the .tlp file.
@@ -326,7 +400,7 @@ Sub CreateSignature(SignatureName, templateFileName)
 		headerHTML=""
 	
 		templateHTML = GetOutlookSignatureHtml(templateFilePath)
-		headerHTML = ReadHeaderSignatureHtml(templateHTML, SignatureName)
+		headerHTML = ReadHeaderSignatureHTML(templateHTML, SignatureName)
 
 		IF LEN(headerHTML) >0 THEN
 		
@@ -343,14 +417,14 @@ Sub CreateSignature(SignatureName, templateFileName)
 			IF len(TestXmasDate) > 0 Then
 				AddDebug "**** Testing Xmas Enabled! **** " 
 				if ucase(TestXmasDate) = "TRUE" or ucase(TestXmasDate) = "FALSE" THEN 
-				TestXmasDate = ""
-			ELSE
+					TestXmasDate = ""
+				ELSE
 				TestXmasDate = ConvertToDate(TestXmasDate)
 				if len(TestXmasDate) = 10 then 
 					cyear = int(right(TestXmasDate,4))
 					cmonth = int(mid(TestXmasDate,4,2))
 					cday = int(left(TestXmasDate,2))
-					AddDebug "Changing Current Date to " & TestXmasDate
+					AddDebug "Changing Current Date to Xmas Test Date : " & TestXmasDate
 				Else
 					AddDebug "*** Invalid Xmas Test Date: " & TestXmasDate 
 				end if
@@ -361,7 +435,7 @@ Sub CreateSignature(SignatureName, templateFileName)
 		IncludeFileHTML = ""
 	    IncludeFile = ReadDefaultSettings("Include", headerHTML)
 		if len(IncludeFile) > 0 then
-			AddDebug "Downloading Include File :" & sourceFilesUrl+IncludeFile
+			AddDebug "Downloading Include File " & sourceFilesUrl+IncludeFile
 			IncludeFileHTML= GetOutlookSignatureHtml(sourceFilesUrl+IncludeFile)
 			if len(IncludeFileHTML) > 0 then 
 				tmpstring=instr(templateHTML,"-->")
@@ -461,9 +535,17 @@ Sub CreateSignature(SignatureName, templateFileName)
 		   DefaultFontSize = ReadDefaultSettings("DefaultFontSize",headerHTML)
 		    LargerFontSize = ReadDefaultSettings("LargerFontSize",headerHTML)
 			
+			
+			SignatureAccount = ReadDefaultSettings("CreateAccountSignature",headerHTML)
+			if ucase(SignatureAccount) = "TRUE" Then
+				CreateSignatureAccount = True
+			Else
+				CreateSignatureAccount = False
+			END IF
+			
 		if len(xmasfrom) > 0 and xmasfrom <> "DD/MM/YYYY" and xmasfrom <> "DD/12/YYYY" then 
 			xmasfrom = ConvertToDate(xmasfrom)
-			if len(XmasLastDay) = 0 then XmasLastDay = xmasfrom
+			if len(XmasLastDay) = 0 then XmasLastDay = FindLastDay(xmasfrom,0)
 		Else
 			if cmonth =1 then 
 				xmasfrom = FindStartDayinMonth("01/12/"+cstr(cyear-1))
@@ -539,20 +621,20 @@ Sub CreateSignature(SignatureName, templateFileName)
 				ELSE
 					xmasfrom = left(xmasfrom,len(xmasfrom)-4) + cstr(cyear)
 				END IF
-				AddDebug "Set Variable: XmasFrom -> " & xmasfrom & " (Auto Xmas Year)"
+				AddDebug "Mod Variable: XmasFrom -> " & xmasfrom & " (Auto Xmas Year)"
 				AutoXmas = True
 			end if
 
 			IF instr(ucase(xmasfrom),"MM") > 0 then
 				xmasfrom = Replace(xmasfrom, "MM", "12")
-				AddDebug "Set Variable: XmasFrom -> " & xmasfrom & " (Auto Xmas Month - December)"
+				AddDebug "Mod Variable: XmasFrom -> " & xmasfrom & " (Auto Xmas Month - December)"
 				AutoXmas = True
 			END IF
 			
 			IF instr(ucase(xmasfrom),"DD") > 0 then
 				xmasfrom = Replace(xmasfrom, "DD", "01")
 				xmasfrom = FindStartDayinMonth(xmasfrom)
-				AddDebug "Set Variable: XmasFrom -> " & xmasfrom & " (Auto - First Work Day in December)"
+				AddDebug "Mod Variable: XmasFrom -> " & xmasfrom & " (Auto - First Work Day in December)"
 				AutoXmas = True
 			END IF
 			
@@ -565,13 +647,13 @@ Sub CreateSignature(SignatureName, templateFileName)
 					xmasto = left(xmasto,len(xmasto)-4) + cstr(cyear+1)
 				end if
 				
-				AddDebug "Set Variable: XmasTo -> " & xmasto&" (Auto Year)"
+				AddDebug "Mod Variable: XmasTo -> " & xmasto&" (Auto Year)"
 				AutoXmas = True
 			end if
 			
 			IF instr(ucase(xmasto),"MM") > 0 then
 				xmasto = Replace(xmasto, "MM", "01")
-				AddDebug "Set Variable: XmasTo -> " & xmasto &" (Auto Month - January)"
+				AddDebug "Mod Variable: XmasTo -> " & xmasto &" (Auto Month - January)"
 				AutoXmas = True
 			END IF
 			
@@ -595,9 +677,9 @@ Sub CreateSignature(SignatureName, templateFileName)
 					xmasto = FindSundayinDate(xmasto, 2)
 				END SELECT
 				IF LEN(NewYearStartWeek) > 0 then 
-					AddDebug "Set Variable: XmasTo -> " & xmasto & " (" & th(int(NewYearStartWeek)) & " Sunday)"
+					AddDebug "Mod Variable: XmasTo -> " & xmasto & " (" & th(cint(NewYearStartWeek)) & " Sunday)"
 				ELSE
-					AddDebug "Set Variable: XmasTo -> " & xmasto & " (Second Sunday)"
+					AddDebug "Mod Variable: XmasTo -> " & xmasto & " (Second Sunday)"
 				END IF
 				AutoXmas = True
 			END IF
@@ -631,14 +713,15 @@ Sub CreateSignature(SignatureName, templateFileName)
 				if len(XmasLastDay) > 0 then    AddDebug "Set Variable: {lastday} OR *|lastday|* -> " & DateExpanded(XmasLastDay)
 				if len(XmasLastDay) > 0 then    AddDebug "Set Variable: {firstholiday} OR *|firstholiday|* -> "& DateExpanded2(DateAddDay(XmasLastDay, 1))
 				if len(preMonday) > 0 then      AddDebug "Set Variable: {firstmonday} OR *|firstmonday|* -> " & DateExpanded(preMonday)
-				if len(NewMonday) > 0 then      AddDebug "Set Variable: {firstday} OR *|firstday|* -> " & DateExpanded(NewMonday)
 				if len(XmasTo) > 0 then         AddDebug "Set Variable: {firstholiday} OR *|firstholiday|* -> "& DateExpanded2(XmasTo)
 				if len(XmasStartYear) > 0 then  AddDebug "Set Variable: {XmasStartYear} OR *|XmasStartYear|* ->"& XmasStartYear
 				if len(XmasFinishYear) > 0 then AddDebug "Set Variable: {XmasFinishYear} OR *|XmasFinishYear|* -> "& XmasFinishYear
 			END IF
 			
+			if len(NewMonday) > 0 then      AddDebug "Set Variable: {firstday} OR *|firstday|* -> " & DateExpanded2(NewMonday)
+			
 			' Only check for the next xmas settings if the current date is between the xmas values or Testing Enabled
-			if isBetweenDate(CDate(xmasfrom), CDate(xmasto)) = True or TestXmas = True then 
+			if (isBetweenDate(CDate(xmasfrom), CDate(xmasto)) = True or TestXmas = True) and dateok = true then 
 				IsXmas = True
 				if TestXmas = True then 
 					AddDebug "************* XMAS TESTING Enabled. -> From: " & cstr(CDate(xmasfrom)) & " To: " & cstr(CDate(xmasto)) & " TestingDate <- " & cstr(cday)&"-"&cstr(cmonth)&"-"&cstr(cyear)
@@ -683,17 +766,25 @@ Sub CreateSignature(SignatureName, templateFileName)
 					AddDebug "Mod Variable: xmastext 'Update *|firstday|*' -> '" & xmastext &"'"
 				END IF
 				if instr(xmastext,"*|resumeday|*") > 0 and len(XmasTo) > 0 then 
-					xmastext = Replace(xmastext,"*|resumeday|*", DateExpanded2(XmasTo) )
+					xmastext = Replace(xmastext,"*|resumeday|*", DateExpanded2(DateAddDay(XmasTo, 1)) )
 					AddDebug "Mod Variable: xmastext 'Update *|resumeday|*' -> '" & xmastext &"'"
 				END IF
 				
-				if instr(xmastext,"{firstmonday}") > 0 and len(PreMonday) > 0 then 
+				if instr(xmastext,"{lastday}") > 0 and len(XmasLastDay) > 0 then 
+					xmastext = Replace(xmastext,"{lastday}", DateExpanded(XmasLastDay))
+					AddDebug "Mod Variable :xmastext 'Update {lastday}' -> '" & xmastext &"'"
+				END IF
+				if instr(xmastext,"{firstmonday}") > 0 and len(preMonday) > 0 then 
 					xmastext = Replace(xmastext,"{firstmonday}", DateExpanded(preMonday))
-					AddDebug "Mod Variable: xmastext 'Update {firstmonday} -> '" & xmastext &"'"
+					AddDebug "Mod Variable :xmastext 'Update {firstmonday} -> '" & xmastext &"'"
 				END IF
 				if instr(xmastext,"{firstday}") > 0 and len(NewMonday) > 0 then 
 					xmastext = Replace(xmastext,"{firstday}", DateExpanded(NewMonday)) 
-					AddDebug "Mod Variable: xmastext 'Update {firstday}' -> '" & xmastext &"'"
+					AddDebug "Mod Variable :xmastext 'Update {firstday}' -> '" & xmastext &"'"
+				END IF
+				if instr(xmastext,"{firstholiday}") > 0 and len(XmasLastDay) > 0 then 
+					xmastext = Replace(xmastext,"{firstholiday}", DateExpanded2(DateAddDay(XmasLastDay, 1)))
+					AddDebug "Mod Variable: firstholiday 'Update {firstholiday}' -> '" & xmastext &"'"
 				END IF
 				
 				xmashighlight = ReadDefaultSettings("XmasHighlightColor", headerHTML)  
@@ -707,14 +798,47 @@ Sub CreateSignature(SignatureName, templateFileName)
 				' Setting the Xmas Image Name if it was previously blank.
 				if len(xmasimagename) = 0 then 
 					imagename = SignatureName +"-Xmas."+DefaultImageType
-					AddDebug "Set Variable: xmasimagename -> " &xmasimagename & " (Was BLANK)"
+					AddDebug "Set Variable: imagename -> " &xmasimagename & " (Was BLANK)"
 				else
 					imagename = xmasimagename
 					AddDebug "Set Variable: imagename -> " &xmasimagename & " (Using XmasImageName)"
 				end if
+				
+				' It is Christmas so use this HTML in the Signature and Remove the NotXmas
+				IF instr(templateHTML, "<!--IFXmasStart-->") > 0 and instr(templateHTML, "<!--IFXmasFinish-->") > 0 THEN
+					AddDebug "Enable HTML Between '<!--IFXmasStart--> and <!--IFXmasFinish-->' - OK"
+					templateHTML = Replace(templateHTML,"<!--IFXmasStart-->","",1,-1,1)
+					templateHTML = Replace(templateHTML,"<!--IFXmasFinish-->","",1,-1,1)
+				END IF
+				IF instr(templateHTML, "<!--IFNotXmasStart-->") > 0 and instr(templateHTML, "<!--IFNotXmasFinish-->") > 0 THEN
+					do
+						templateHTML = RemoveItemFromHTML(templateHTML, "<!--IFNotXmasStart-->", "<!--IFNotXmasFinish-->")
+					loop until instr(templateHTML, "<!--IFNotXmasStart-->") = 0 or instr(templateHTML, "<!--IFNotXmasFinish-->") = 0 
+				END IF
+				IF instr(templateHTML, "<!--XmasStart-->") > 0 and instr(templateHTML, "<!--XmasFinish-->") > 0 THEN
+					AddDebug "Enable HTML Between '<!--XmasStart--> and <!--XmasFinish-->' - OK"
+					templateHTML = Replace(templateHTML,"<!--XmasStart-->","",1,-1,1)
+					templateHTML = Replace(templateHTML,"<!--XmasFinish-->","",1,-1,1)
+				END IF
 			Else
-				' Its Not Christmas so remove the HTML from the Signature
-				templateHTML = RemoveItemFromHTML(templateHTML, "<!--XmasStart-->", "<!--XmasFinish-->")
+				' Its Not Christmas so remove the HTML from the Signature - (pass loop if missing start or end tags)
+				IF instr(templateHTML, "<!--XmasStart-->") > 0 and instr(templateHTML, "<!--XmasFinish-->") > 0 THEN
+					do
+						templateHTML = RemoveItemFromHTML(templateHTML, "<!--XmasStart-->", "<!--XmasFinish-->")
+					loop until instr(templateHTML, "<!--XmasStart-->") = 0 or instr(templateHTML, "<!--XmasFinish-->") = 0 
+				END IF
+				
+				' It is not Christmas so use the HTML between the NotXmasStart and NotXmasFinish (Remove the 
+				IF instr(templateHTML, "<!--IFNotXmasStart-->") > 0 and instr(templateHTML, "<!--IFNotXmasFinish-->") > 0 THEN
+					AddDebug "Enable HTML Between '<!--IFNotXmasStart--> and <!--IFNotXmasFinish-->' - OK"
+					templateHTML = Replace(templateHTML,"<!--IFNotXmasStart-->","",1,-1,1)
+					templateHTML = Replace(templateHTML,"<!--IFNotXmasFinish-->","",1,-1,1)
+				END IF
+				IF instr(templateHTML, "<!--IFXmasStart-->") > 0 and instr(templateHTML, "<!--IFXmasFinish-->") > 0 THEN
+					do
+						templateHTML = RemoveItemFromHTML(templateHTML, "<!--IFXmasStart-->", "<!--IFXmasFinish-->")
+					loop until instr(templateHTML, "<!--IFXmasStart-->") = 0 or instr(templateHTML, "<!--IFXmasFinish-->") = 0 
+				END IF
 			end if
 		end if
 		
@@ -941,7 +1065,7 @@ Sub CreateSignature(SignatureName, templateFileName)
 				if CombineIfBlank = "" then CombineIfBlank = "False"
 				CombineLastCode(MaxCombine) = FindCombineLast
 				CombineBlankCode(MaxCombine) = CombineIfBlank
-				CombineErr=False
+				CombineErr= False
 				do
 					FindCombineField = ReadDefaultSettings("CombineField", headerHTML)
 					FindCombineHTML = ReadDefaultSettings("CombineHTMLCode", headerHTML)
@@ -967,7 +1091,7 @@ Sub CreateSignature(SignatureName, templateFileName)
 		templateHTML = RemoveComments(templateHTML)
 
     else
-	    AddDebug "No header comments found in " & SignatureName
+	    AddDebug "No header comments found in " & SignatureName& " - FAILED"
     END IF
 
     'The value is blank, but the template contains the text to update, so lets autocreate the value.
@@ -997,13 +1121,14 @@ Sub CreateSignature(SignatureName, templateFileName)
 	city = TransformText(TransformCity, "city")
 	country= TransformText(TransformCountry, "country")
 	
-	' Find some more values to use 
 	footertext = ReadDefaultSettings("FooterText", headerHTML)
+	' Replace ^ Char with <p></p> values in FooterText
 	if instr(footertext,"^") and instr(footerText,"<p>") = 0 then 
 		footertext = "<p>" + footertext +"</p>"
 		footertext = Replace(footertext,"^", "</p><p>")
 	end if
 	
+	' Update Xmas values in Footer Text
 	if len(footerText) > 0 then 
 		footertext = Replace(footertext,"*|xmasstartyear|*",cstr(XmasStartYear))
 		footertext = Replace(footertext,"*|xmasfinishyear|*",cstr(XmasFinishYear))
@@ -1082,7 +1207,7 @@ Sub CreateSignature(SignatureName, templateFileName)
 		' Hiding Tables using these vales if blank
 		xmastext_t = IIF(xmastext = "", "hidden", chr(34)+chr(34))
 		extranote_t = IIF(extranote = "", "hidden", chr(34)+chr(34))
-		xmastext_v = IIF(xmastext = "", "hidden", chr(34)+chr(34))
+		xmastext_v = IIF(xmastext = "", "hidden", "")
 		extranote_v = IIF(extranote = "", "hidden", chr(34)+chr(34))
 	end if
 	if DisplaySocialIcons = False then 
@@ -1093,26 +1218,29 @@ Sub CreateSignature(SignatureName, templateFileName)
 	
 	Dim ImageSwap, FindSwap, WithSwap
 	IF MaxXmasImageSwap > 0 Then
-		AddDebug "Modifying " + cstr(MaxXmasImageSwap)+" Image Names"
-		Do
-			ImageSwap = split(XmasImageSwap(MaxXmasImageSwap),",")
-			if ubound(ImageSwap) > 0 then 
-				FindSwap = ImageSwap(0)
-				WithSwap = ImageSwap(1)
-				if len(FindSwap) > 0 and len(WithSwap) > 0 then 
-					AddDebug("Mofifying Image " + FindSwap+" -> " + WithSwap)
-					templateHTML = Replace(templateHTML,FindSwap, WithSwap,1,-1,1)
+		if IsXmas = True then 
+			AddDebug "Swapping " + cstr(MaxXmasImageSwap)+" XMAS Images."
+			Do
+				ImageSwap = split(XmasImageSwap(MaxXmasImageSwap),",")
+				if ubound(ImageSwap) > 0 then 
+					FindSwap = ImageSwap(0)
+					WithSwap = ImageSwap(1)
+					if len(FindSwap) > 0 and len(WithSwap) > 0 then 
+						AddDebug("Image Name " + FindSwap+" -> " + WithSwap)
+						templateHTML = Replace(templateHTML,FindSwap, WithSwap,1,-1,1)
+					end if
 				end if
-			end if
-			
-			MaxXmasImageSwap = MaxXmasImageSwap -1
-		LOOP until MaxXmasImageSwap <= 0
-		
+	
+				MaxXmasImageSwap = MaxXmasImageSwap -1
+			LOOP until MaxXmasImageSwap <= 0
+		Else
+			AddDebug "NOT Swapping " + cstr(MaxXmasImageSwap)+" XMAS Images as isXmas is False."
+		END IF
 	END IF
 	
 	' Modify values with HTML code
 	IF MaxInsertHTML > 0 THEN
-		AddDebug "Modifying " + cstr(MaxInsertHTML)+" Field Values with HTML Code"
+		AddDebug "Modifying " + cstr(MaxInsertHTML)+" Field Values with HTML Code."
 
 		DO	
 			tmpInsertHTML = ""
@@ -1162,6 +1290,7 @@ Sub CreateSignature(SignatureName, templateFileName)
 	
 	' Add a HTML Space to the phone details
 	if AddPhoneSpace = True then 
+		AddDebug "Mod Variable: phone, mobile, companyphone, ipphone, companyfax, companyphone -> + HTML Space '&nbsp;'"
 		if len(phone) then phone = phone + Spc
 		if len(mobile) then mobile = mobile + Spc
 		if len(companyphone) then companyphone = companyphone + Spc
@@ -1172,6 +1301,7 @@ Sub CreateSignature(SignatureName, templateFileName)
 	
 	' Add a HTML Space to the address details
 	IF AddAddressSpace = True then 
+		AddDebug "Mod Variable: address, country, suburb, city, pobox, state -> + HTML Space '&nbsp;'"
 		if len(address) then address = address + Spc
 		if len(country) then country = country + Spc
 		if len(suburb) then suburb = suburb + Spc
@@ -1182,24 +1312,31 @@ Sub CreateSignature(SignatureName, templateFileName)
 	
 	' Add an Extra HTML Spaces to some address details
 	IF AddAdditionalAddressSpace = True then 
+		AddDebug "Mod Variable: address -> + Additional HTML Space '&nbsp;'"
 		if len(address) then address = address + Spc
 	END IF
 	IF AddAdditionalCitySpace = True then 
+		AddDebug "Mod Variable: city -> + Additional HTML Space '&nbsp;'"
 		if len(city) then city = city + Spc
 	END IF
 	IF AddAdditionalStateSpace = True then 
+		AddDebug "Mod Variable: state -> + Additional HTML Space '&nbsp;'"
 		if len(state) then state = state + Spc
 	END IF
 	IF AddAdditionalSuburbSpace = True then 
+		AddDebug "Mod Variable: suburb -> + Additional HTML Space '&nbsp;'"
 		if len(suburb) then suburb = suburb + Spc
 	END IF
 	IF AddAdditionalPOBoxSpace = True then 
+		AddDebug "Mod Variable: pobox -> + Additional HTML Space '&nbsp;'"
 		if len(pobox) then pobox = pobox + Spc
 	END IF
 	IF AddAdditionalTitleSpace = True then 
+		AddDebug "Mod Variable: title -> + Additional HTML Space '&nbsp;'"
 		if len(title) then title = title + Spc
 	END IF
 	IF AddAdditionalPrevTitleSpace = True then 
+		AddDebug "Mod Variable: title -> + Additional Previous HTML Space '&nbsp;'"
 		if len(title) then title = Spc + title
 	END IF
 	
@@ -1464,11 +1601,15 @@ Sub CreateSignature(SignatureName, templateFileName)
 	END IF
 	
 	
+	IF LinkImages = True THEN
+		templateHTML = UpdateAllImages(templateHTML, sourceFilesUrl)
+	END IF
 
 	'SetVariables templateHTML
 	
 	' Display Active Directory values in the debug. makes it easier to check debug file, rather than checking 2 files at once.
 	AddDebug ""
+	AddDebug "==========================================================================================="
 	if len(name) then AddDebug         "name         :" & name
 	if len(firstname) then AddDebug    "firstname    :" & firstname
 	if len(lastname) then AddDebug     "lastname     :" & lastname
@@ -1493,11 +1634,15 @@ Sub CreateSignature(SignatureName, templateFileName)
 	if len(xmastext) then AddDebug     "xmas         :" & xmastext
 	if len(footertext) then AddDebug   "footer       :" & footertext
 	if len(IDnumber) then AddDebug     "IDnumber     :" & IDnumber
+	AddDebug "==========================================================================================="
 	AddDebug ""
 	
 	' Create the Users HTML signature file
 	Dim htmlSignatureFile, textSignatureFile
 	on error resume next
+	
+	if CreateSignatureAccount = True and len(email) > 0 THEN	
+	END IF
 	
 	Set htmlSignatureFile = fileSystem.CreateTextFile(signaturesFolderPath & SignatureName & ".htm", True)
 	htmlSignatureFile.Write(templateHTML)	
@@ -1511,24 +1656,28 @@ Sub CreateSignature(SignatureName, templateFileName)
 	Set textSignatureFile = Nothing
 	on error goto 0
 	
-		
-    ' Download the required image files
-    IF len(trim(imagename)) > 0 THEN
-	    DownloadFile imagename, sourceFilesUrl, signaturesFolderPath &SignatureImageFolder
-    ELSE
-         ' The imagename value was not set in the Signature Template file, so find all the imagefiles in the html code and download them.
-         DownloadAllFiles templateHTML,sourceFilesUrl, signaturesFolderPath &SignatureImageFolder
-    END IF
+	
+		' Download the required image files
+		IF len(trim(imagename)) > 0 THEN
+			DownloadFile imagename, sourceFilesUrl, signaturesFolderPath &SignatureImageFolder
+		ELSE
+			' The imagename value was not set in the Signature Template file, so find all the imagefiles in the html code and download them.
+			DownloadAllFiles templateHTML,sourceFilesUrl, signaturesFolderPath &SignatureImageFolder
+		END IF
     
-	' Download an additional imagename.
-	IF len(aditionalimage) > 0 THEN 
-		DownloadFile aditionalimage, sourceFilesUrl, signaturesFolderPath &SignatureImageFolder
-	END IF
+		' Download an additional imagename.
+		IF len(aditionalimage) > 0 THEN 
+			DownloadFile aditionalimage, sourceFilesUrl, signaturesFolderPath &SignatureImageFolder
+		END IF
+		
+	
+		
+    
 	
 	' Download any SocialIcons Images
 	IF MaxSocialIcons > 0 then 
 		DO
-			Socialtmpname=SignatureName
+			Socialtmpname = SignatureName
 			IF LEN(SocialIconName) > 0 THEN Socialtmpname=SocialIconName
 			imagename = Socialtmpname +"-"+SocialIcon(MaxSocialIcons)
 			IF INSTR(imagename,".") = 0 then 
@@ -1605,26 +1754,39 @@ Function SetToDefault(strVarname, strdefault)
 	end if
 end function
 
-Function RemoveItemFromHTML(byval templateHTML, byval Start, byval Finish)
-	
-	if instr(templateHTML, Start) > 0 and instr(templateHTML, Finish) > 0 THEN
-		Dim p1, p2, part1
-		p1 = instr(templateHTML, Start)
-		if p1 > 0 then 
-			p2 = instr(p1+len(Start),templateHTML,Finish)
-			if p2 > 0 then 
-				if p1 = 1 then p1 = 2
-				part1 = left(templateHTML, p1-1) + mid(templateHTML, p2 + len(Finish), len(templateHTML))
+Function RemoveItemFromHTML(tempHTML, byval Start, byval Finish)
+
+	Dim p, pp, part1
+	part1 = tempHTML
+	if instr(lcase(tempHTML), lcase(Start)) > 0 and instr(lcase(tempHTML), lcase(Finish)) > 0 THEN
+
+		p = instr(lcase(tempHTML), lcase(Start))
+		if p > 0 then 
+			pp = instr(p+len(Start), lcase(tempHTML),lcase(Finish))
+			if pp > 0 then 
+				if p = 1 then p = 2
+				part1 = left(tempHTML, p-1) + mid(tempHTML, pp + len(Finish), len(tempHTML)- pp - len(Finish))
 				if len(part1) > 0 then 
-					RemoveItemFromHTML = part1
-					AddDebug "Removing HTML Code Between '" & Start&"' and '" & Finish &"'"
+					AddDebug "Modify Template HTML: Remove Code at Pos " &cstr(p-1) & "  " & cstr(pp + len(Finish)- p) &" Chars Between '" & Start&"' and '" & Finish &"' - OK"
 				end if
 			end if
 		end if	
+		
 	Else
-		AddDebug "Did Not Remove HTML Code Between '" & Start&"' and '" & Finish &"'"
-		RemoveItemFromHTML = templateHTML
+		if instr(tempHTML, Start) > 0  THEN
+			' Remove the Start TAG so wont get stuck looping 
+			part1 = Replace(tempHTML,Start,"",1,-1,1)
+			AddDebug "Modify Template HTML: Missing Finish '" & Finish &"' HTML Code - FAILED (Check TPL file) Need matching Start and Finish TAGs "
+		END IF
+		if instr(tempHTML, Finish) > 0 THEN
+			' Remove the Finish TAG so wont get stuck looping 
+			part1 = Replace(tempHTML,Finish,"",1,-1,1)
+			AddDebug "Modify Template HTML: Missing Start '" & Start &"' HTML Code - FAILED (Check TPL file) Need matching Start and Finish TAGs "
+		END IF
+		
 	END IF
+	
+	RemoveItemFromHTML = part1
 END Function
 
 Function ReadHeaderSignatureHTML(byval templateHTML, byval SignatureName)
@@ -1633,7 +1795,7 @@ Function ReadHeaderSignatureHTML(byval templateHTML, byval SignatureName)
     p1 = instr(templateHTML,"<!--")
 	
 	' The first comment in the templateHTML is used for signature settings.
-	' It must also have the signaturename mentioned as it confirms that it is a header file
+	' It must also have the signaturename mentioned as it confirms that it is a proper signature header file
     if p1 then 
             p2 = instr(p1+5,templateHTML,"-->")
             if p2 then 
@@ -1643,7 +1805,7 @@ Function ReadHeaderSignatureHTML(byval templateHTML, byval SignatureName)
 					ReadHeaderSignatureHTML = part1
 					exit function
 		        else
-				AddDebug "Header not used as " & SignatureName &".tpl not found in header comments. - FAILED"
+				AddDebug "Header not used as text '" & SignatureName &".tpl' was not found in header comments. - FAILED"
 				end if
 			end if
 		end if	
@@ -1656,12 +1818,12 @@ Function CheckBlankValue(byval templateHTML, CheckValue, FindValue)
    
        if instr(templateHTML,CheckValue) then 
           if len(trim(FindValue)) = 0 then 
-              CheckBlankValue=true
+              CheckBlankValue = True
           else
-             CheckBlankValue=False
+             CheckBlankValue = False
           end if
        else
-          CheckBlankValue=False
+          CheckBlankValue = False
        end if
 
 End Function
@@ -1712,14 +1874,24 @@ Function RemoveComments (byval templateHTML)
 	' Strip out the first comment so that the users signature does not contain these settings in the new html signature
 	Dim p1,p2, part1
     p1 = instr(templateHTML, "<!--")
-    
+		
     if p1 then 
 		part1 = left(templateHTML, p1-1)
         p2 = instr(p1+4,templateHTML, "-->")
         if p2 < len(templateHTML)-2 then 
             RemoveComments = part1 + mid(templateHTML, p2 + 3, len(templateHTML))
+			
+			' Remove any newline characters from the beginning or end of the HTML
+			if left(RemoveComments,2) = VbCrLf then 
+				RemoveComments = mid(RemoveComments,3,len(RemoveComments))
+			end if
+			if right(RemoveComments,2) = VbCrLf then 
+				RemoveComments = left(RemoveComments,len(RemoveComments)-2)
+			end if
+			
 			AddDebug "headerHTML settings stripped from Signature File."
             exit function
+			
         end if
         RemoveComments = templateHTML
     end if
@@ -1809,7 +1981,7 @@ END Sub
 Sub AddDebug(strText)
 
 	' Add Information to the Debug File (debug.txt) in each users Signature Folder
-	
+	' If TPL Files contains <*|Debug|*True> then these messages are generated (CHECK: %appdata%/Microsoft/Signatures/debug.log)
 	on error resume next
 
 	if use_debug = true then 
@@ -1832,6 +2004,7 @@ Sub UpdateGlobalVarsFromAD()
 
     ' Get the logged on users details
     Dim user, domainName, userLDAP, userDN, wshShell
+	dim dnsHostName, dsServiceName, serverName
 	Dim p1, p2, e1, e2, findXmas, findXmasSignature, checkpos, findPhone
 	Set wshShell = CreateObject( "WScript.Shell" )
     Set user = CreateObject("WScript.Network")
@@ -1841,7 +2014,14 @@ Sub UpdateGlobalVarsFromAD()
 	' Determine DNS name of domain from RootDSE.
 	Set objRootDSE = GetObject("LDAP://RootDSE")
 	strDNSDomain = objRootDSE.Get("defaultNamingContext")
-
+	
+	dnsHostName = objRootDSE.Get("dnsHostName")
+	AddDebug "Server: " & dnsHostName
+	' dsServiceName = objRootDSE.Get("dsServiceName")
+	' serverName = objRootDSE.Get("ServerName")
+	' AddDebug "ServerName: " & serverName
+	' AddDebug "dsServiceName: " & dsServiceName
+		
 	' Use the NameTranslate object to find the NetBIOS domain name from the
 	' DNS domain name.
 	Set objTrans = CreateObject("NameTranslate")
@@ -1850,7 +2030,8 @@ Sub UpdateGlobalVarsFromAD()
 	strNetBIOSDomain = objTrans.Get(ADS_NAME_TYPE_NT4)
 	' Remove trailing backslash.
 	domainName = Left(strNetBIOSDomain, Len(strNetBIOSDomain) - 1)
-
+	
+	
     userName = user.UserName
 	if len(userName) = 0 then 
 		userName = wshShell.ExpandEnvironmentStrings("%USERNAME%")
@@ -1867,7 +2048,7 @@ Sub UpdateGlobalVarsFromAD()
 	AddDebug "Username: " & UserName &"  Domain: " & domainName
 	
 	UserDN = GetUserDN(userName,domainName)
-    AddDebug "Geting Active Directory data from LDAP://" & UserDN
+    AddDebug "Using LDAP://" & UserDN
 
     Set userLDAP = GetObject("LDAP://" & UserDN)
 	
@@ -2045,6 +2226,8 @@ Sub UpdateGlobalVarsFromAD()
     Set User = Nothing
     Set userLDAP = Nothing
 	Set wshShell = Nothing
+	Set objTrans = Nothing
+	Set objRootDSE = Nothing
 	
 End Sub
 
@@ -2121,7 +2304,7 @@ Function GetOutlookSignatureHtml(byval templateFilePath)
 End Function
 
 
-SUB DownloadAllFiles(byval templateHTML,sourceUrl, destinationDirectory)
+SUB DownloadAllFiles(byval templateHTML, sourceUrl, destinationDirectory)
 
 	' Download All the Image Files found in the Template
 	AddDebug "Downloading all <img src = Files "
@@ -2159,69 +2342,201 @@ SUB DownloadAllFiles(byval templateHTML,sourceUrl, destinationDirectory)
 END SUB
 
 
+FUNCTION UpdateAllImages(templateHTML, sourceUrl)
+
+	' Modify all the Image Files to be http://....
+	AddDebug "Modifying All Image FileNames with URLs"
+
+    Dim a,b,c,d, f, Part1, Part2, Part3, Part4, filename,OK
+    Part1 = "<img "
+	' Seach for these combinations - just incase they were typed in differently
+	Part2 = "src=" + chr(34)
+	Part3 = "src =" + chr(34)
+	Part4 = "src = " + chr(34)
+
+    f = chr(34)
+    b = 1
+    DO
+		a = instr(b, templateHTML, part1) ' Must find this first part before anything else.
+		if a then 
+			a = instr(a + 1, templateHTML, part2): d = LEN(Part2)
+			if a = 0 then a = instr(a + 1, templateHTML, part3): d = LEN(Part3)
+			if a = 0 then a = instr(a + 1, templateHTML, part4): d = LEN(Part4) 
+	
+			IF a then 
+				c = instr(a + d, templateHTML, f)
+				IF c - a - d - 1 > 1 then 
+					filename = trim(mid(templateHTML, a + d, c - a - d))
+					if lcase(filename) = "*|imagename|*" then 
+						filename = SignatureName + "." + DefaultImageType
+					end if
+	
+					if instr(filename, sourceURL) = 0 then 
+						AddDebug "Modifying src=" & chr(34) & filename &chr(34) & " -> src=" &chr(34) & sourceUrl+ filename & chr(34)
+						templateHTML = left(templateHTML, a + d -1 ) + sourceUrl+ filename+ mid(templateHTML, a + d+(c - a - d),len(templateHTML))
+					end if
+					
+				END IF
+				b = c + 1
+			END IF
+		END IF
+	LOOP UNTIL b> LEN(templateHTML) OR a=0
+
+	AddDebug "Modifying All Other Source FileNames with URLs"
+	
+	' Seach for these combinations - just incase they were typed in differently
+	Part1 = "src: url("
+	Part2 = "src:url("
+	Part3 = "src:url ("
+	Part4 = "src: url ("
+	b = 1
+	f = ")"
+    DO
+		a = instr(b, templateHTML, Part1): d = LEN(Part1)
+		if a = 0 then a = instr(b, templateHTML, Part2): d = len(Part2)
+		if a = 0 then a = instr(b, templateHTML, Part3): d = len(Part3)
+		if a = 0 then a = instr(b, templateHTML, Part4): d = len(Part4)
+		if a then 
+			c = instr(a + d, templateHTML, f)
+			if c > 1 then 
+				filename = trim(mid(templateHTML, a + d, c - a - d))
+				if instr(filename, sourceURL) = 0 then 
+					AddDebug "Modifying src: url(" & filename &")  -> src: url(" & sourceUrl+ filename &")"
+					templateHTML = left(templateHTML, a + (d-1) ) + sourceUrl+ filename+ mid(templateHTML, a + d+(c - a - d),len(templateHTML))
+				end if
+			End if 
+			b = c + 1
+		end if
+    LOOP UNTIL b> LEN(templateHTML) OR a=0
+
+	UpdateAllImages = templateHTML
+	
+END FUNCTION
+
+
 Function DownloadFile(ByVal filename, ByVal sourceUrl, ByVal destinationDirectory)
-	
-	' Dont download a file if running in Manual Mode... assumes the file is already in the %appdata% Signatures Folder
-	IF ManualUser = True then 
-		AddDebug "Using Existing File " & destinationDirectory & filename
-		exit function
-	END IF
-	
-	' Download a File
-	AddDebug "Downloading FILE " & filename& " FROM " & sourceUrl & " TO " & destinationDirectory 
-		
-    Dim sourceFileUrl: sourceFileUrl = sourceUrl & filename
-    Dim destinationFilePath: destinationFilePath = destinationDirectory & filename       
-	
-    Dim httpRequest: Set httpRequest = CreateObject("Msxml2.ServerXMLHTTP")
 
+	Dim sourceFileUrl: sourceFileUrl = sourceUrl & filename
+	Dim destinationFilePath: destinationFilePath = destinationDirectory & filename 
+	dim Msg
 	
-    'on error resume next
-    httpRequest.open "GET", sourceFileUrl, false
-    httpRequest.setRequestHeader "Cache-Control", "max-age=0"
-    httpRequest.send()       
+	IF LinkImages = False THEN
+	
+		' Dont download a file if running in Manual Mode... assumes the file is already in the %appdata% Signatures Folder
+		IF ManualUser = True then 
+			AddDebug "Using Existing File " & destinationDirectory & filename
+			DownloadFile = ""
+			exit function
+		END IF
+	
+		' Download a File
+		Msg = "Downloading file " & sourceUrl & filename & " -> '" & destinationDirectory & "'"
+				
+		Dim httpRequest: Set httpRequest = CreateObject("Msxml2.ServerXMLHTTP")
+	
+		'on error resume next
+		httpRequest.open "GET", sourceFileUrl, false
+		httpRequest.setRequestHeader "Cache-Control", "max-age=0"
+		httpRequest.send()       
         
-    if httpRequest.status = 200 Then
-        Dim adoStream: Set adoStream = CreateObject("ADODB.Stream") 
+		if httpRequest.status = 200 Then
+			Dim adoStream: Set adoStream = CreateObject("ADODB.Stream") 
 
-        adoStream.Type = 1 'adTypeBinary
-        adoStream.Open
-		adoStream.Position = 0    'Set the stream position to the start
-        adoStream.Write httpRequest.ResponseBody
+			adoStream.Type = 1 'adTypeBinary
+			adoStream.Open
+			adoStream.Position = 0    'Set the stream position to the start
+			adoStream.Write httpRequest.ResponseBody
 
-
-        ' if the file already exists. remove it
-        If fileSystem.FileExists(destinationFilePath) Then fileSystem.DeleteFile(destinationFilePath)       
+			' if the file already exists. remove it just before you get it again.
+			If fileSystem.FileExists(destinationFilePath) Then fileSystem.DeleteFile(destinationFilePath)       
 		
-        ' save a new copy of the file
-        adoStream.SaveToFile(destinationFilePath)
-        adoStream.Close
+			' save a new copy of the file
+			adoStream.SaveToFile(destinationFilePath)
+			adoStream.Close
 
-        Set adoStream = nothing
-        DownloadFile = destinationFilePath
-		AddDebug "Download File - OK"
-    Else
-        AddDebug "Download File - FAILED ("
-        DownloadFile = ""
+			Set adoStream = nothing
+			DownloadFile = destinationFilePath
+			Msg = Msg & " - OK"
+		Else
+			Msg= Msg & " - FAILED (Response: " & cstr(httpRequest.status) & ")"
+			DownloadFile = ""
+		End if
+		
+		AddDebug Msg
+		
+		on error goto 0
+		Set httpRequest = Nothing
+	ELSE
+		' The download did not happen, but the return value should say it does
+		DownloadFile = destinationFilePath
+	END if
+	
+End Function
 
-    End if
+Function DownloadTemplateFile(ByVal filename, ByVal sourceUrl, ByVal destinationDirectory)
 
-    on error goto 0
-    Set httpRequest = Nothing
+	Dim sourceFileUrl: sourceFileUrl = sourceUrl & filename
+	Dim destinationFilePath: destinationFilePath = destinationDirectory & filename 
+	Dim Msg
+	
+		' Dont download a file if running in Manual Mode... assumes the file is already in the %appdata% Signatures Folder
+		IF ManualUser = True then 
+			AddDebug "Using Existing Template File " & destinationDirectory & filename
+			DownloadFile = ""
+			exit function
+		END IF
+	
+		' Download a File
+		Msg = "Downloading Template File " & sourceUrl & filename &" TO '" & destinationDirectory &"'"
+		
+		Dim httpRequest: Set httpRequest = CreateObject("Msxml2.ServerXMLHTTP")
+	
+		'on error resume next
+		httpRequest.open "GET", sourceFileUrl, false
+		httpRequest.setRequestHeader "Cache-Control", "max-age=0"
+		httpRequest.send()       
+        
+		if httpRequest.status = 200 Then
+			Dim adoStream: Set adoStream = CreateObject("ADODB.Stream") 
 
+			adoStream.Type = 1 'adTypeBinary
+			adoStream.Open
+			adoStream.Position = 0    'Set the stream position to the start
+			adoStream.Write httpRequest.ResponseBody
+
+
+			' if the file already exists. remove it
+			If fileSystem.FileExists(destinationFilePath) Then fileSystem.DeleteFile(destinationFilePath)       
+		
+			' save a new copy of the file
+			adoStream.SaveToFile(destinationFilePath)
+			adoStream.Close
+
+			Set adoStream = nothing
+			DownloadTemplateFile = destinationFilePath
+			Msg = Msg & " - OK"
+		Else
+			Msg= Msg & " - FAILED (Response: " & cstr(httpRequest.status) & ")"
+			DownloadTemplateFile = ""
+		End if
+		
+		AddDebug Msg
+		
+		on error goto 0
+		Set httpRequest = Nothing
+	
 End Function
 
 
 Function GetTPLFile(ByVal filename, ByVal sourceUrl)
 	
 	' Download a File
-	AddDebug "Reading File : " & filename& " From : " & sourceUrl
+	AddDebug "Downloading TPL File " & sourceUrl & filename
 
     Dim sourceFileUrl: sourceFileUrl = sourceUrl & filename
 	'Dim httpRequest : Set httpRequest = CreateObject("WinHttp.WinHttpRequest.5.1")
     'Dim httpRequest: Set httpRequest = CreateObject("Msxml2.ServerXMLHTTP")
 	Dim httpRequest: Set httpRequest = CreateObject("Msxml2.ServerXMLHTTP.6.0")
-	
 	Dim txt
 	
     'on error resume next
@@ -2230,12 +2545,10 @@ Function GetTPLFile(ByVal filename, ByVal sourceUrl)
     httpRequest.send()       
 		
     if httpRequest.status = 200 Then
-		AddDebug "Read File - OK"
+		AddDebug "Download File - OK"
 		txt = httpRequest.responseText
-        
     Else
-        AddDebug "Read File - FAILED (" & cstr(httpRequest.status) &")"
-        
+        AddDebug "Download File - FAILED (HTTP " & cstr(httpRequest.status) &")"
     End if
 
     on error goto 0
@@ -2245,7 +2558,7 @@ End Function
 
 
 Function IIf( expr, truepart, falsepart )
-    IIf = falsepart
+    IIf = Falsepart
     If expr Then IIf = truepart
 End Function
 
@@ -2270,35 +2583,44 @@ End Function
 
 Function AuthenticateDomain ( logonName, Password)
 
-ldapFilter = "(samAccountName=" & logonName & ")"      'you could also search for an UPN here...
+	on error resume next
+	ldapFilter = "(samAccountName=" & logonName & ")"      'you could also search for an UPN here...
 
-Set ado = CreateObject("ADODB.Connection")
-ado.Provider = "ADSDSOObject"
-ado.Properties("User ID") = logonName
-ado.Properties("Password") = password
-ado.Properties("Encrypt Password") = True
-ado.Open "ADSearch" 
-Set objectList = ado.Execute("<LDAP://" & ADserverIP  & "/" & ADDomain & ">;" & ldapFilter & ";distinguishedName,samAccountName,displayname,userPrincipalName;subtree")
+	Set ado = CreateObject("ADODB.Connection")
+	ado.Provider = "ADSDSOObject"
+	ado.Properties("User ID") = logonName
+	ado.Properties("Password") = password
+	ado.Properties("Encrypt Password") = True
+	ado.Open "ADSearch" 
+	Set objectList = ado.Execute("<LDAP://" & ADserverIP  & "/" & ADDomain & ">;" & ldapFilter & ";distinguishedName,samAccountName,displayname,userPrincipalName;subtree")
+	if err.number <> 0 then 
+		err.clear
+		if len(ADserverIP2) > 0 then 
+			AddDebug "LDAP AD Server "& ADserverIP &"  - FAILED (Now trying second AD Server "& ADserverIP2 &")"
+			Set objectList = ado.Execute("<LDAP://" & ADserverIP2  & "/" & ADDomain & ">;" & ldapFilter & ";distinguishedName,samAccountName,displayname,userPrincipalName;subtree")
+		end if
+	end if
 
-While Not objectList.EOF
-    AuthenticateDomain = objectList.Fields("distinguishedName")
-    Username =  objectList.Fields("samAccountName")
+	While Not objectList.EOF
+		AuthenticateDomain = objectList.Fields("distinguishedName")
+		Username =  objectList.Fields("samAccountName")
 
-    'On Error Resume Next 
-    'displayName = "" : displayName = objectList.Fields("displayname")
-    'logonNameUPN = "" : logonNameUPN = objectList.Fields("displayname")
-    'On Error Goto 0
-
-    'WScript.Echo logonName & " " & logonNameUPN  & " " & displayName & " " & userDN
-   
-    objectList.MoveNext
-Wend
-
+		'displayName = "" : displayName = objectList.Fields("displayname")
+		'logonNameUPN = "" : logonNameUPN = objectList.Fields("displayname")
+		'On Error Goto 0
+		'WScript.Echo logonName & " " & logonNameUPN  & " " & displayName & " " & userDN
+		
+       objectList.MoveNext
+	Wend
+	
+	SET ado = Nothing
+	
+	on error goto 0
 
 end function
 
 Function isBetweenDate(BeginDate, EndDate)
-	if IsEmpty(BeginDate) = False and IsEmpty(EndDate) = false then 
+	if IsEmpty(BeginDate) = False and IsEmpty(EndDate) = False then 
 		If Date() >= BeginDate and Date() <= EndDate Then
 			isBetweenDate = True
 		Else
@@ -2430,12 +2752,12 @@ Sub CreateVcard(ByVal signaturesFolderPath, ByVal SignatureName)
 	if len(name) then vCard=vCard +"FN:"+StripHTML(name) + VbCrLf
 	if len(company) then vCard=vCard +"ORG:" + StripHTML(company) + VbCrLf
 	if len(title) then vCard=vCard +"TITLE:" + StripHTML(title) + VbCrLf
-	if len(phone) then vCard=vCard +"TEL;WORK;VOICE:" + StripHTML(phone) + VbCrLf
-	if len(mobile) then vCard=vCard +"TEL;CELL;VOICE:" + StripHTML(mobile) + VbCrLf
-	if len(companyfax) then vCard=vCard +"TEL;WORK;FAX:" + StripHTML(companyfax) + VbCrLf
+	if len(phone) then vCard=vCard +"TEL;TYPE=WORK;VOICE:" + StripHTML(phone) + VbCrLf
+	if len(mobile) then vCard=vCard +"TEL;TYPE=CELL;VOICE:" + StripHTML(mobile) + VbCrLf
+	if len(companyfax) then vCard=vCard +"TEL;TYPE=WORK;FAX:" + StripHTML(companyfax) + VbCrLf
 	if len(webpage) then vCard=vCard +"URL;WORK:" +StripHTML(webpage) + VbCrLf
 	if len(address) then 
-		vCard=vCard + "ADR;WORK;PREF:"+StripHTML(address)+";;"+StripHTML(pobox)+";"+StripHTML(suburb)+";"+StripHTML(state)+";"+StripHTML(postcode)+";"+StripHTML(countryname)+ vbCrlf 
+		vCard=vCard + "ADR;TYPE=WORK;PREF:"+StripHTML(address)+";;"+StripHTML(pobox)+";"+StripHTML(suburb)+";"+StripHTML(state)+";"+StripHTML(postcode)+";"+StripHTML(countryname)+ vbCrlf 
 		vCard=vCard +"LABEL;WORK;PREF;ENCODING=QUOTED-PRINTABLE:" + StripHTML(address)+"=0D=0A=" + VbCrLf
 		if len(suburb) then vCard=vCard + StripHTML(suburb)
 		if len(state) then vCard=vCard + ", " + StripHTML(state)
@@ -2647,7 +2969,7 @@ Function MobileNumber (byval strMobile)
 end function
 
 Function MobileINTNumber (byval strMobile)
-	DIM a, tmpNumber, newnum
+	DIM a, tmpNumber, newnum, pt1
 	tmpNumber=replace(strMobile," ","")
 	tmpNumber=replace(tmpNumber,"-","")
 	if len(tmpNumber) = 10 then 
@@ -2657,7 +2979,6 @@ Function MobileINTNumber (byval strMobile)
 	else
 		MobileINTNumber = strMobile
 	end if
-
 	
 end function
 
@@ -2752,19 +3073,21 @@ END Function
 Function CheckExtra(byval strGroupDN)
 
 
-	DIM wshShell, objSysInfo, user, domainName, userLDAP, userDN, strNetBIOSDomain
-	Set objSysInfo = CreateObject( "WinNTSystemInfo" )
-	Set wshShell = CreateObject( "WScript.Shell" )
-	userName = wshShell.ExpandEnvironmentStrings( "%USERNAME%" )
-	strNetBIOSDomain = wshShell.Environment("Process").Item("userdomain")
+	'DIM wshShell, objSysInfo, user, domainName, userLDAP, userDN, strNetBIOSDomain
+	'Set objSysInfo = CreateObject( "WinNTSystemInfo" )
+	'Set wshShell = CreateObject( "WScript.Shell" )
+	'userName = wshShell.ExpandEnvironmentStrings( "%USERNAME%" )
+	'strNetBIOSDomain = wshShell.Environment("Process").Item("userdomain")
 	
-    SET user = CreateObject("WScript.Network")
-    userName = user.UserName
-    domainName = user.UserDomain
+    'SET user = CreateObject("WScript.Network")
+    'userName = user.UserName
+    'domainName = user.UserDomain
 	'domainName = objSysInfo.DomainName
-	'WScript.Echo UserName, domainName
 	
-	UserDN = GetUserDN(userName,domainName)
+	AddDebug UserName &" " & domainName &" " & strGroupDN
+	
+	
+	'UserDN = GetUserDN(userName,domainName)
 	
     if len(UserDN)> 0  then 
 		DIM objGroup, objMember
@@ -2781,6 +3104,7 @@ Function CheckExtra(byval strGroupDN)
 	
 	SET user = Nothing
 	SET objSysInfo = Nothing
+	Set wshShell = Nothing
 	
 	AddDebug "LDAP: User " & UserDN &" not found in MemberNote"
 	
@@ -2996,8 +3320,9 @@ End Function
 
 Function DateAddDay(byval dteDate, byval intdays)
 
-	DIM Modifyer
-	Modifyer = DateAdd("d", intdays, dteDate)
+	DIM Modifyer, newDate
+	newDate = dteDate
+	Modifyer = DateAdd("d", intdays, newDate)
 	DateAddDay = ConvertToDate(Modifyer)
 
 End Function
@@ -3005,8 +3330,10 @@ End Function
 Function FindLastDay(byval dteDate, byval extradays)
 
 DIM ChrDay, ChrWeekDay, Modifyer
-
-ChrDay = cstr(25 - extradays)+"/12/" + right(dteDate, 4)
+ dteDate = replace( dteDate,"YYYY", cstr(cyear))
+ dteDate = replace( dteDate,"MM", cstr(cmonth))
+ 
+ChrDay = "12/"+cstr(25 - extradays)+"/" + right(dteDate, 4)
 
 ChrWeekDay = Weekday(ChrDay)
 Modifyer = dteDate
@@ -3054,9 +3381,11 @@ END Function
 
 Function ConvertToDate(strDate)
 	
-	DIM find, a, d, m, y, ad, am, Cd
+	' Date Format is expected to be DD/MM/YYYY or DD-MM-YYYY or D/M/YYYY or D/M/YY
 	
-	ConvertToDate = strDate
+	DIM find, a, d, m, y, ad, am, newDate, an, mm
+	newDate = ""
+
 	
 	' Find a "/" or "-" in the date string
 	find = "/"
@@ -3065,7 +3394,8 @@ Function ConvertToDate(strDate)
 		find = "-"
 		a = instr(strDate, find)
 	END IF
-	IF a >  0 then 
+	
+	IF a >  0 THEN
 		ad = a
 		d = left(strDate, ad - 1)
 		am = instr(ad + 1, strDate, Find)
@@ -3073,12 +3403,43 @@ Function ConvertToDate(strDate)
 			m = mid(strDate, ad + 1, (am - ad)-1)
 			y = mid(strDate, am + 1,len(strDate))
 		END IF
-		if len(d) > 0 and len(m) > 0 and len(y) = 4 then 
+		IF y = "YY" then Y ="YYYY"
+		
+		' Dont worry about this as the script wont be used enough to handle this situation. HAHA
+		IF len(y) = 2 then
+			IF cint(y) < 50 THEN
+				Y = "20" + y
+			Else
+				Y = "19" + y
+			END IF
+		END IF
+		
+		IF LEN(d) > 0 AND LEN(m) > 0 AND LEN(y) = 4 THEN
+			IF m <> "MM" THEN
+				' Check if Month is Jan, Feb, etc....
+				IF IsNumeric(m) = False THEN 
+					mm = ucase(m)
+					m = "0" ' Set to 0 If ts not found as a proper date month.
+					FOR an = 1 to 12 
+						IF INSTR(ucase(MonthName(an)), mm) > 0 THEN
+							m = cstr(an)
+							EXIT FOR
+						END IF
+					NEXT
+				END IF
+				IF cint(m) > 12 THEN
+					' Swap Day and Month around (at least you get 1/2 the dates correct if they are wrongly used.)
+					swp = m : m = d : d = swp
+				END IF
+			END IF
+			' Create the Correct Format for the Result.
 			d = PadString(d, 2, "0", "left")
 			m = PadString(m, 2, "0", "left")
-			ConvertToDate = d + "/" + m + "/" + y
+			newDate = d + "/" + m + "/" + y
 		END IF
 	END IF
+	
+	ConvertToDate = newDate
 	
 End Function
 
@@ -3103,21 +3464,55 @@ Function PadString(pString,pLength,pChar,pSide)
 End Function
 
 Function DateExpanded(strDate)
+	' Created a User Friendly Date Format 
+	' EG: Friday 25th of January 2025
+	
 	strDate = ConvertToDate(strDate)
 	if len(strDate) = 10 then 
 		DateExpanded = WeekDayName(Weekday(strDate)) + " " & th(Day(strDate)) + " of " + MonthName(Month(strDate)) + " " + cstr(Year(strDate))
 	Else
 		DateExpanded = ""
 	end if
+	
 End Function
 
 Function DateExpanded2(strDate)
+	' Created another User Friendly Date Format 
+	' EG: January 25, 2025
+	
 	strDate = ConvertToDate(strDate)
 	if len(strDate) = 10 then 
 		DateExpanded2 = MonthName(Month(strDate)) + " "+ cstr(Day(strDate)) + ", " + cstr(Year(strDate))
 	Else
 		DateExpanded2 = ""
 	end if
+	
+End Function
+
+Function DateExpanded3(strDate)
+	' Created another User Friendly Date Format 
+	' EG: January 25th, 2025
+	
+	strDate = ConvertToDate(strDate)
+	if len(strDate) = 10 then 
+		DateExpanded3 = MonthName(Month(strDate)) + " "+ th(day(strDate))+", " + cstr(Year(strDate))
+	Else
+		DateExpanded3 = ""
+	end if
+	
+End Function
+
+Function DateExpanded4(strDate)
+	' Created another User Friendly Date Format 
+	' EG: Jan 25, 2025
+	
+	strDate = ConvertToDate(strDate)
+	if len(strDate) = 10 then 
+		DateExpanded4 = MonthName(Month(strDate), False) + " "+ cstr(Day(strDate)) + ", " + cstr(Year(strDate))
+	Else
+		DateExpanded4 = ""
+	end if
+	
 End Function
 
 
@@ -3149,7 +3544,7 @@ function Ping(strComputer)
     if instr(LCase(strPingOut), "reply") then
         flag = TRUE
     else
-        flag = FALSE
+        flag = False
     end if
 
     on error goto 0	
@@ -3294,4 +3689,96 @@ FUNCTION ReadINISetting(findstr, strText, occurance)
 	
 	ReadINISetting = strFound
 	
+END Function
+
+FUNCTION CreateSignatureSubFolderFiles(signatureFolderPath, SubFolder, SignatureName, ImageFileName) 
+
+	DIM strInfo, NewFileName, NewFile, insertHTML, picturenum, spid, Pict,ID, typeID, NewImageName
+	
+	if Right(signatureFolderPath,1) <> "\" then signatureFolderPath = signatureFolderPath & "\"
+	if Right(SubFolder,1) <> "\" then SubFolder = SubFolder & "\"
+	
+	ImageNextNumber = ImageNextNumber + 1
+	
+	Pict = "Picture_x" + PadString(cstr(ImageNextNumber), 4, "0", "left")+ "_1"
+	ID = "_x0000_i1" + PadString(cstr(ImageNextNumber), 3, "0", "left")
+	typeID = "_x0000_t"+ + PadString(cstr(ImageNextNumber), 2, "0", "left")
+	NewImageName = "image" + PadString(cstr(ImageNextNumber), 3, "0", "left") +".png"
+	
+	' <meta name=Originator content="Microsoft Word 15">
+	' <link rel=File-List href="TEST_files/filelist.xml">
+	' <link rel=Edit-Time-Data href="TEST_files/editdata.mso">
+	'+ 
+	'  </o:OfficeDocumentSettings>
+	'  </xml><![endif]-->
+	' <link rel=themeData href="TEST_files/themedata.thmx">
+	' <link rel=colorSchemeMapping href="TEST_files/colorschememapping.xml">
+	'+
+	'<p class=MsoNormal>
+	' <span style='mso-no-proof:yes'>
+	' <a href="https://www.joii.org/">
+	' <span style='color:windowtext'>
+		
+				insertHTML = "	<!--[if gte vml 1]>" & vbCrLf
+	insertHTML =insertHTML & " 		<v:shapetype id=""" & typeID & """ coordsize=""21600,21600"" o:spt=""75"" o:preferrelative=""t"" path=""m@4@5l@4@11@9@11@9@5xe"" filled=""f"" stroked=""f"">" & VbCrLf
+	insertHTML =insertHTML & " 			<v:stroke joinstyle=""miter""/>" & VbCrLf
+	insertHTML =insertHTML & " 			<v:formulas>" & VbCrLf
+	insertHTML =insertHTML & " 				<v:f eqn=""if lineDrawn pixelLineWidth 0""/>" & VbCrLf
+	insertHTML =insertHTML & " 				<v:f eqn=""sum @0 1 0""/>" & vbCrLf
+	insertHTML =insertHTML & " 				<v:f eqn=""sum 0 0 @1""/>"& vbCrLf
+	insertHTML =insertHTML & " 				<v:f eqn=""prod @2 1 2""/>"& vbCrLf
+	insertHTML =insertHTML & " 				<v:f eqn=""prod @3 21600 pixelWidth""/>"& vbCrLf
+	insertHTML =insertHTML & " 				<v:f eqn=""prod @3 21600 pixelHeight""/>"& vbCrLf
+	insertHTML =insertHTML & " 				<v:f eqn=""sum @0 0 1""/>"& vbCrLf
+	insertHTML =insertHTML & " 				<v:f eqn=""prod @6 1 2""/>"& vbCrLf
+	insertHTML =insertHTML & " 				<v:f eqn=""prod @7 21600 pixelWidth""/>"& vbCrLf
+	insertHTML =insertHTML & " 				<v:f eqn=""sum @8 21600 0""/>"& vbCrLf
+	insertHTML =insertHTML & " 				<v:f eqn=""prod @7 21600 pixelHeight""/>"& vbCrLf
+	insertHTML =insertHTML & " 				<v:f eqn=""sum @10 21600 0""/>"& vbCrLf
+	insertHTML =insertHTML & " 			</v:formulas>"& vbCrLf
+	insertHTML =insertHTML & " 			<v:path o:extrusionok=""f"" gradientshapeok=""t"" o:connecttype=""rect""/>"& vbCrLf
+	insertHTML =insertHTML & " 			<o:lock v:ext=""edit"" aspectratio=""t""/>"& vbCrLf
+	insertHTML =insertHTML & " 		</v:shapetype>"& vbCrLf
+	insertHTML =insertHTML & "		<v:shape id=""" & Pict & """ o:spid=""" & ID & """ type=""#" & typeID & """ style='width:180pt;height:180pt;visibility:visible;mso-wrap-style:square'>"& vbCrLf
+	insertHTML =insertHTML & " 			<v:imagedata src=""" & SubFolder & "/" & NewImageName & """ o:title=""""/>"& vbCrLf
+	insertHTML =insertHTML & " 		</v:shape>"& vbCrLf
+	insertHTML =insertHTML & " 	<![endif]-->"& vbCrLf
+	insertHTML =insertHTML & " 	<![if !vml]>"& vbCrLf
+	insertHTML =insertHTML & "		<img width=240 height=240 src=""" & SubFolder & "/" & NewImageName & """ v:shapes=""" & Pict & """>"& vbCrLf
+	insertHTML =insertHTML & " 	<![endif]>"& vbCrLf
+	'   </span>
+	'	</a>
+	'	</span><o:p></o:p>
+	'</p>
+	
+	
+	NewFileName = signatureFolderPath & SubFolder & "colorschememapping.XML"
+	IF NOT fileSystem.FileExists(NewFileName)THEN 
+		strinfo ="<?xml version=""1.0"" encoding=""UTF-8"" standalone=""yes""?>" & VbCrLf & "<a:clrMap xmlns:a=""http://schemas.openxmlformats.org/drawingml/2006/main"" bg1=""lt1"" tx1=""dk1"" bg2=""lt2"" tx2=""dk2"" accent1=""accent1"" accent2=""accent2"" accent3=""accent3"" accent4=""accent4"" accent5=""accent5"" accent6=""accent6"" hlink=""hlink"" folHlink=""folHlink""/>"
+		on error resume next
+		Set NewFile = fileSystem.CreateTextFile(NewFileName, True)
+		NewFile.Write(strInfo)	
+		NewFile.Close
+		on error goto 0
+	END IF
+
+	NewFileName = signatureFolderPath & SubFolder & "filelist.XML"
+	IF NOT fileSystem.FileExists(NewFileName)THEN 
+		strinfo ="<xml xmlns:o=""urn:schemas-microsoft-com:office:office"">" & VbCrLf 
+		strinfo = strinfo & " <o:MainFile HRef=""../" & SignatureName & """/>" & VbCrLf
+		strinfo = strinfo & " <o:File HRef=""themedata.thmx""/>" & VbCrLf
+		strinfo = strinfo & " <o:File HRef=""colorschememapping.xml""/>" & VbCrLf
+		
+		'strinfo = strinfo & " <o:File HRef=""image001.png""/>" & VbCrLf
+		
+		strinfo = strinfo & " <o:File HRef=""filelist.xml""/>" & VbCrLf
+		on error resume next
+		Set NewFile = fileSystem.CreateTextFile(NewFileName, True)
+		NewFile.Write(strInfo)	
+		NewFile.Close
+		on error goto 0
+	END IF
+
+		
+
 END Function

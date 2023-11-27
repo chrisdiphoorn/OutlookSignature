@@ -13,13 +13,12 @@ Sub MainProgram()
 	
 	IF fileSystem.FileExists(signaturesFolderPath + "_Signature.ini") Then
 	
-		' Manually Get the Users details from the special File
-		' Create the signature files in the users profile
+		' Manually Get the Users details from the special File, then create the signature using these details instead of an Active Directory Domain.
 		ManualUser = True
-		AddDebug "Found _Signatuire.ini File - Read User details from this file instead of looking at ActiveDirectory"
+		AddDebug "Found _Signatuire.ini File - Read User details from this file instead of looking at Active Directory"
 		ReadUserInfoFile (signaturesFolderPath + "_Signature.ini")
 		OneSignatureName = ""
-		OnlyOneSgnature = False
+		OnlyOneSignature = False
 		A = 1
 		if len(SignatureGroupFileName(A)) > 0 then 
 			CreateSignature SignatureGroupFileName(A), SignatureGroupFileName(A)+".tpl"
@@ -49,10 +48,10 @@ Sub MainProgram()
 		'	sourceFilesUrl = sourceFilesIP 
 		'END IF
 	
-		' Check to see if user is in any Signature group then Create the signature for Outlook                
+		' Check to see if user is in any Signature Group then create that signature using the users info.
 		IF MaxSignatureGroup > 0 THEN
 			OneSignatureName = ""
-			OnlyOneSgnature = False
+			OnlyOneSignature = False
 			A = 1
 			DO
 				if len(SignatureGroupName(A)) > 0 then 
@@ -66,12 +65,12 @@ Sub MainProgram()
 							ForceSig = SignatureGroupFileName(A)
 						END IF
 					
-						IF OnlyOneSgnature = False and len(OneSignatureName)=0 then 
-							OnlyOneSgnature = True
+						IF OnlyOneSignature = False and len(OneSignatureName)=0 then 
+							OnlyOneSignature = True
 							OneSignatureName=SignatureGroupFileName(A)
 						ELSE
 							' User has as more than one Signature so we cant set the default automatically.
-							OnlyOneSgnature = False
+							OnlyOneSignature = False
 						END IF
 				
 					ELSE
@@ -90,11 +89,11 @@ Sub MainProgram()
 	' A force signature setting has been set, so we will set that signature as default.
 	IF len(ForceSig) <> 0 Then
 		SetDefaultMailSignature(ForceSig)
-		OnlyOneSgnature = False
+		OnlyOneSignature = False
 	END If
 	
 	' User only has only 1 Signature - so lets set that as the default one.
-	IF OnlyOneSgnature = True and len(OneSignatureName) <> 0 then 
+	IF OnlyOneSignature = True and len(OneSignatureName) <> 0 then 
 		SetDefaultMailSignature(OneSignatureName)
 	END IF
 
