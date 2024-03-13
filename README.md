@@ -1,5 +1,5 @@
 # Outlook Email Signature
-Automatically Create Outlook Signatures on Windows Workstations based on Active Directory User Group Membership
+Automatically Create Outlook Signatures on Windows Workstations based on Active Directory User Group Membership, Or a text file containing user details.
 
 Place the CreateSignatures.vbs, CreateSignatures.wsf, SignatureDefaults.vbs, SignatureFunctions.vbs files into a Shared Folder EG: \\\ServerName\FileShare</br>
 Place the SIGNATURE.tpl, SIGNATURE-Xmas.tpl and any Images file into a WEB Server which only needs to be accessable from the internal Network.</br>
