@@ -118,7 +118,7 @@ To use each parameter add a '<' at the beginning so the parameter looks like thi
  *|socialicons_v|* 	If the user has -social in their AD notes then this is set to " style = 'display:none' "</br>
  </br>
  Additional Display Values:</br>
-	</br>
+ </br>
  *|day|*							Display the current Date Day Value EG 5</br>
  *|dday|*							Display the current dates 2 digit Day Value EG 05</br>
  *|dayname|*							Display the current dates Days Name EG Monday</br>
@@ -285,7 +285,9 @@ Outlook 2010 - Version 14 </br>
 Outlook 2013 - Version 15 </br>
 Outlook 2016 - Version 16 </br>
 </br>
-**HTML Coding Examples** </br>
+
+**HTML Coding Examples**</br>
+
 Remove hovering mouse with cursor:default !important </br>
 Remove Hyperlink underline with href="" + text-decoration:none !important </br>
 Change Underline color with style </br>
@@ -332,8 +334,8 @@ Set Debug=True in the tpl file to create a 'debug.txt' file that information on 
 	    ipphone = ipPhone </br>
 	WhenChanged = WhenChanged </br>
 	      notes = info </br>
-	</br>
-NOTES Field Settings and Examples.</br>
+
+**NOTES Field Settings and Examples**</br>
 </br>
 	+signature(xxxx) [ OPTIONS ] 		= will only change OPTIONS if the signature xxxx is the same name as the current processing signature </br>
 	+signature(xxxx) +title(xxxxx)  	= will only change the title to xxxx if the signature xxxx is the same name as the current processing signature </br>
