@@ -1,18 +1,18 @@
 # Outlook Email Signature
-Automatically Create Outlook Signatures on Windows Workstations based on Active Directory User Group Membership, Or a text file containing user details.
+Automatically Create Outlook Signatures based on Active Directory User Group Membership, Or a text file containing user details.
 
 Place the CreateSignatures.vbs, CreateSignatures.wsf, SignatureDefaults.vbs, SignatureFunctions.vbs files into a Shared Folder EG: \\\ServerName\FileShare</br>
-Place the SIGNATURE.tpl, SIGNATURE-Xmas.tpl and any Images file into a WEB Server which only needs to be accessable from the internal Network.</br>
+Place the SIGNATURE.tpl, SIGNATURE-Xmas.tpl and any Image files into a WEB Server. Create a vhost site that only needs to be accessable from the internal Network.</br>
 Update the SignatureDefaults.vbs file with the Relevant ADDomain, SourceFilesURL, LDAPurl details.</br>
 	ADDomain is the Base DN Path where DC = Domain Component. Use Active Directory Users and Computers. Select View, Advanced Features, Then get the properties of the first entry, and select Attribute Editor. The DN path will be shown in the distinguishedName Attribute. You can edit it and copy the value.</br>
 
-Update the SIGNATURE.tpl file. Rename the File to reflect the Company Name. + Also update the contents of the file with the relevenat details and settings.
+Update the SIGNATURE.tpl file. Rename the File to reflect the Company Name and also update the contents of the file with the relevenat details and settings.
 NOTE: The Heading Text of the File needs to include the Name of the file. If the script does not find the name of the tpl file insdie it, it wont run.</br>
 
-NB: The HTML code is Outlook HTML 1.0 so it does not support the newer HTML commands.
-Each .tpl file is split up into 2 main sections. The Signature Variables & Settings ( Set Between the {<!-- -->}) , and the Signature HTML Code.
+NB: The HTML code is based on Outlook HTML 1.0 so it does not support any newer HTML commands. Outlook HTML can be a little tight and finiky on how to get things 100%.
+A xxxxxx.tpl file is split up into 2 main sections. The Signature Variables & Settings ( Set Between the {<!-- -->}) , and the Signature HTML Code.
 
-Create Signature Group(s) and place users into these/this Group(s). Ensure that the Description Of the Group is the Name of the Signature .tpl file.
+In Activdirectory create Signature Group(s) and place users into these/this Group(s). Ensure that the Description Of the Group is the Name of the Signature .tpl file.
 Update the OU details into the SignatureDeafult file so the script knows where to look for the Signature Group(s).
 
 From the Users Loginscript run the c:\windows\system32\cscript.exe //NoLogo \\ServerName\FileShare\CreateSignatures.wsf File.
